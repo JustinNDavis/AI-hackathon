@@ -149,4 +149,12 @@
         <field>Legal_Entity__c.Role__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <classAccesses>
+        <apexClass>LoanController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>LoanService</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
 </PermissionSet>
