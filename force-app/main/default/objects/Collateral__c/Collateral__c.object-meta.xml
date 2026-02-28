@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description>Collateral used to secure a loan; links to the loan and the collateral owner (Account).</description>
+    <enableActivities>true</enableActivities>
+    <label>Collateral</label>
+    <nameField>
+        <label>Collateral Name</label>
+        <type>Text</type>
+    </nameField>
+    <pluralLabel>Collateral</pluralLabel>
+    <sharingModel>ReadWrite</sharingModel>
+</CustomObject>
