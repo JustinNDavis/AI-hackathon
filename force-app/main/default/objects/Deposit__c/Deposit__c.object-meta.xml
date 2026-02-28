@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description>Represents a deposit record with amount, type, and maturity.</description>
+    <enableActivities>true</enableActivities>
+    <label>Deposit</label>
+    <nameField>
+        <label>Deposit Name</label>
+        <type>Text</type>
+    </nameField>
+    <pluralLabel>Deposits</pluralLabel>
+    <sharingModel>ReadWrite</sharingModel>
+</CustomObject>
