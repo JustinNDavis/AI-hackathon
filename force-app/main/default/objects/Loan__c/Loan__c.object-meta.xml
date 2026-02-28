@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description>Represents a loan record with principal, terms, and status.</description>
+    <enableActivities>true</enableActivities>
+    <label>Loan</label>
+    <nameField>
+        <label>Loan Name</label>
+        <type>Text</type>
+    </nameField>
+    <pluralLabel>Loans</pluralLabel>
+    <sharingModel>ReadWrite</sharingModel>
+</CustomObject>

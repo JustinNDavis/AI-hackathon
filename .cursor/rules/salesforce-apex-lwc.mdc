@@ -1,0 +1,156 @@
+---
+description: Salesforce Apex & LWC clean code rules — naming, design, SOQL, testing, LWC patterns
+alwaysApply: true
+---
+
+# Salesforce Apex & LWC — Clean Code Rules
+
+## General Principles
+- Follow Clean Code principles (Robert C. Martin): readable, maintainable, and self-documenting code
+- Favor clarity over cleverness — code is read far more than it is written
+- One responsibility per class, method, or component
+- Avoid duplication (DRY — Don't Repeat Yourself)
+- Leave code cleaner than you found it (Boy Scout Rule)
+
+---
+
+## Apex — Naming Conventions
+- Classes: `PascalCase`, noun-based, descriptive (e.g., `OpportunityService`, `AccountRepository`)
+- Methods: `camelCase`, verb-based (e.g., `getActiveAccounts()`, `calculateDiscount()`)
+- Variables: `camelCase`, meaningful names — never `x`, `temp`, `data`, `obj`
+- Constants: `UPPER_SNAKE_CASE` (e.g., `MAX_RETRY_ATTEMPTS`)
+- Test classes: suffix with `Test` (e.g., `OpportunityServiceTest`)
+- No abbreviations unless universally understood (e.g., `Id`, `URL` are fine)
+
+## Apex — Class Design
+- One class = one responsibility (Single Responsibility Principle)
+- Keep classes under 300 lines; extract logic into helper/service classes if larger
+- Use `private` visibility by default; only expose what is needed
+- Avoid `static` utility god-classes — use proper service/domain layering:
+  - **Controller**: thin, handles UI/API requests only
+  - **Service**: business logic
+  - **Selector/Repository**: SOQL queries only
+  - **Domain**: record-level logic (trigger handlers, validation)
+- Use `with sharing` unless there is a documented reason not to
+- Prefer dependency injection over hardcoded dependencies for testability
+
+## Apex — Methods
+- Methods should do ONE thing and do it well
+- Keep methods under 20 lines; extract sub-steps into named helper methods
+- Method names should describe WHAT they do, not HOW (e.g., `getExpiredContracts()` not `queryContractsByEndDate()`)
+- Avoid boolean flag parameters — split into two methods instead
+- Return early to reduce nesting (guard clauses)
+- No dead code — remove unused methods and variables
+
+## Apex — SOQL & DML
+- Never put SOQL or DML inside loops — always bulkify
+- Use selector classes to centralize all queries
+- Always query only the fields you need
+- Use `FOR UPDATE` explicitly when locking is required
+- Wrap DML in try/catch only when you handle the exception meaningfully
+- Use `Database.insert(records, false)` with error handling for partial saves when appropriate
+
+## Apex — Error Handling
+- Never swallow exceptions silently
+- Log errors using a consistent logging framework (e.g., `Logger.error()`)
+- Throw meaningful custom exceptions with descriptive messages
+- Validate inputs at service boundaries, not deep in helper methods
+
+## Apex — Testing
+- Every class must have a corresponding test class with 85%+ coverage minimum (aim for 100%)
+- Tests must assert behavior, not just execute lines
+- Use `@TestSetup` for shared test data
+- Use descriptive test method names: `test_getActiveAccounts_returnsOnlyActiveRecords()`
+- Never use `seeAllData=true`
+- Use `Test.startTest()` / `Test.stopTest()` to isolate governor limits
+- Mock external callouts using `HttpCalloutMock`
+- One logical assertion per test where possible
+
+## Apex — Comments & Documentation
+- Code should be self-documenting — use comments only to explain WHY, never WHAT
+- Add ApexDoc headers to all `public` and `global` methods
+- Remove all commented-out code before committing
+- TODO comments must include a ticket/issue reference
+
+---
+
+## LWC — Naming Conventions
+- Component folders: `camelCase` (e.g., `accountSummaryCard`, `opportunityList`)
+- JavaScript variables/methods: `camelCase`
+- CSS classes: `kebab-case` (e.g., `card-header`, `action-button`)
+- Wire properties: prefix with `$` only when passing as reactive property (Salesforce standard)
+- Event names: `kebab-case`, past-tense (e.g., `record-selected`, `form-submitted`)
+- Constants: `UPPER_SNAKE_CASE` in a shared `constants.js` if reused across components
+
+## LWC — Component Design
+- One component = one responsibility (avoid multi-purpose "mega components")
+- Split large templates into child components — templates over 100 lines are a smell
+- Smart vs. Dumb component pattern:
+  - **Smart (container)**: fetches data, manages state, handles logic
+  - **Dumb (presentational)**: receives data via `@api`, fires events upward
+- Avoid deep nesting of conditional rendering — extract into sub-components
+- Keep `@api` properties minimal and well-typed with JSDoc
+
+## LWC — JavaScript
+- Keep JS files under 150 lines; extract utilities into `utils.js` or shared modules
+- No business logic in templates — move to JS or service layers
+- Use `@wire` for read data when possible; use imperative Apex only when you need control flow
+- Always handle wire/imperative errors (e.g., with `reduceErrors`)
+- Use `async/await` over `.then()` chains for readability
+- Avoid `console.log` in production code
+- Clean up event listeners and subscriptions in `disconnectedCallback`
+- Use ES6+ features: destructuring, spread, optional chaining, nullish coalescing
+
+## LWC — Templates (HTML)
+- Keep templates readable — one concept per section, logical top-to-bottom flow
+- Use meaningful `if:true` / `iterator` variable names
+- Always add a `key` to `for:each` iterations using a unique record field (e.g., `key={item.Id}`)
+- Use `lwc:if`, `lwc:elseif`, `lwc:else` (API v55+) instead of legacy `if:true`
+- Avoid inline styles — use CSS classes
+- All interactive elements must be keyboard accessible (use `<button>`, not `<div onclick>`)
+- Use ARIA attributes for custom interactive elements
+
+## LWC — CSS
+- Scope styles to the component — avoid `:host` overrides of Lightning Base Components unless necessary
+- Use CSS custom properties (Design Tokens) for colors, spacing, and typography
+- No `!important` unless absolutely unavoidable (document why)
+- Mobile-first responsive design using `@media` queries
+
+## LWC — Events & Communication
+- Parent → Child: use `@api` properties
+- Child → Parent: use custom events with `bubbles: false, composed: false` by default
+- Sibling communication: use a shared parent or Lightning Message Service (LMS)
+- Publish/Subscribe (PubSub) is discouraged — prefer LMS for cross-component communication
+- Always document custom events with JSDoc
+
+## LWC — Testing
+- Write Jest tests for all non-trivial components
+- Test user interactions, not implementation details
+- Mock Apex calls and wire adapters using `@salesforce/apex` mocks
+- Test error states explicitly
+- Use `querySelector` with accessible selectors when possible
+
+---
+
+## File & Folder Structure
+```
+force-app/main/default/
+  classes/
+    AccountService.cls          # Business logic
+    AccountServiceTest.cls      # Corresponding test
+    AccountSelector.cls         # SOQL queries only
+    AccountDomain.cls           # Trigger/record logic
+  lwc/
+    accountSummaryCard/         # Smart container
+    accountSummaryCardItem/     # Dumb child component
+    sharedUtils/                # Shared JS utilities
+```
+
+---
+
+## Commit & PR Standards
+- Commits must reference a ticket: `feat(JIRA-456): add bulk account reassignment logic`
+- No commented-out code in PRs
+- No `System.debug` statements left in production Apex
+- All new Apex must have test coverage verified before merge
+- Follow the Conventional Commits format: `feat`, `fix`, `refactor`, `test`, `chore`
