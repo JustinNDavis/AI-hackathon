@@ -1,0 +1,55 @@
+<template>
+    <lightning-card title="Accounts" icon-name="standard:account">
+        <div class="slds-p-around_medium">
+            <template lwc:if={hasError}>
+                <div class="slds-text-color_error slds-m-bottom_medium">{error}</div>
+            </template>
+            <template lwc:if={hasAccounts}>
+                <div class="account-cards">
+                    <template for:each={accountsWithFlip} for:item="account">
+                        <div key={account.Id} class="card-wrapper" data-id={account.Id} onclick={handleCardClick}>
+                            <div class={account.cardClass}>
+                                <div class="card-face card-front">
+                                    <div class="card-name">{account.Name}</div>
+                                    <div class="card-meta">
+                                        <span class="label">Industry</span>
+                                        <span class="value">{account.Industry}</span>
+                                    </div>
+                                    <div class="card-meta">
+                                        <span class="label">Annual Revenue</span>
+                                        <span class="value">{account.formattedRevenue}</span>
+                                    </div>
+                                    <p class="card-hint">Click for details</p>
+                                </div>
+                                <div class="card-face card-back">
+                                    <div class="card-name card-name-back">{account.Name}</div>
+                                    <template lwc:if={account.Phone}>
+                                        <div class="card-detail"><span class="label">Phone</span> {account.Phone}</div>
+                                    </template>
+                                    <template lwc:if={account.Website}>
+                                        <div class="card-detail"><span class="label">Website</span> {account.Website}</div>
+                                    </template>
+                                    <template lwc:if={account.Type}>
+                                        <div class="card-detail"><span class="label">Type</span> {account.Type}</div>
+                                    </template>
+                                    <template lwc:if={account.NumberOfEmployees}>
+                                        <div class="card-detail"><span class="label">Employees</span> {account.NumberOfEmployees}</div>
+                                    </template>
+                                    <template lwc:if={account.BillingCity}>
+                                        <div class="card-detail"><span class="label">Location</span> {account.BillingCity}<template lwc:if={account.BillingState}>, {account.BillingState}</template></div>
+                                    </template>
+                                    <p class="card-hint">Click to flip back</p>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+            <template lwc:elseif={hasError}>
+            </template>
+            <template lwc:else>
+                <p class="slds-text-color_weak">No accounts to display.</p>
+            </template>
+        </div>
+    </lightning-card>
+</template>

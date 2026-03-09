@@ -3,11 +3,11 @@
     <fullName>Owner__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
     <description>Account that owns the collateral.</description>
-    <externalId>false</externalId>
     <label>Owner</label>
     <referenceTo>Account</referenceTo>
     <relationshipLabel>Collateral</relationshipLabel>
     <relationshipName>Collateral</relationshipName>
     <required>false</required>
+    <trackTrending>false</trackTrending>
     <type>Lookup</type>
 </CustomField>

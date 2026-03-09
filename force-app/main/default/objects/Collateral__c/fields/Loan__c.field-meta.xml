@@ -3,11 +3,11 @@
     <fullName>Loan__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
     <description>Loan this collateral secures.</description>
-    <externalId>false</externalId>
     <label>Loan</label>
     <referenceTo>Loan__c</referenceTo>
     <relationshipLabel>Collateral</relationshipLabel>
     <relationshipName>Collateral</relationshipName>
     <required>false</required>
+    <trackTrending>false</trackTrending>
     <type>Lookup</type>
 </CustomField>

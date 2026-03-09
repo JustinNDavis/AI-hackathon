@@ -1,0 +1,178 @@
+<template>
+    <lightning-card title="Service Requests" icon-name="standard:case">
+        <div class="slds-p-around_medium">
+            <template lwc:if={context.objectApiName}>
+                <p class="slds-m-bottom_medium slds-text-body_regular">
+                    <strong>Record:</strong> {recordName}
+                    <template lwc:if={hasDelinquentFlag}>
+                        <span class="slds-badge slds-badge_warning slds-m-left_x-small">DELINQUENT</span>
+                    </template>
+                </p>
+
+                <!-- Step 2: Service type cards -->
+                <template lwc:if={serviceConfigs.length}>
+                    <h3 class="slds-text-heading_small slds-m-bottom_small">Select service type</h3>
+                    <div class="service-cards slds-m-bottom_medium">
+                        <template for:each={serviceConfigs} for:item="config">
+                            <div key={config.developerName} class="service-card slds-box slds-box_x-small slds-m-bottom_x-small" data-config={config.developerName} onclick={handleSelectService}>
+                                <div class="slds-text-heading_small">{config.serviceCategory}</div>
+                                <div class="slds-text-body_small slds-text-color_weak">Priority: {config.defaultPriority} | SLA: {config.slaHours}hr</div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <!-- Step 3: Dynamic form -->
+                <template lwc:if={selectedConfig}>
+                    <div class="slds-box slds-box_x-small slds-m-bottom_medium form-section">
+                        <h3 class="slds-text-heading_small slds-m-bottom_small">{selectedConfig.serviceCategory}</h3>
+                        <div class="slds-form slds-form_stacked">
+                            <div class="slds-form-element slds-m-bottom_small">
+                                <label class="slds-form-element__label">Subject <abbr class="slds-required" title="required"></abbr></label>
+                                <lightning-input type="text" value={subject} onchange={handleSubjectChange} required placeholder="Subject"></lightning-input>
+                            </div>
+                            <div class="slds-form-element slds-m-bottom_small">
+                                <label class="slds-form-element__label">Description <abbr class="slds-required" title="required">*</abbr></label>
+                                <lightning-textarea value={description} onchange={handleDescriptionChange} placeholder="Description"></lightning-textarea>
+                            </div>
+                            <div class="slds-form-element slds-m-bottom_small">
+                                <label class="slds-form-element__label">Priority</label>
+                                <lightning-combobox name="priority" value={priority} options={priorityOptions} onchange={handlePriorityChange}></lightning-combobox>
+                            </div>
+                            <template for:each={requiredFieldsWithValues} for:item="field">
+                                <div key={field.label} class="slds-form-element slds-m-bottom_small">
+                                    <label class="slds-form-element__label">{field.label}</label>
+                                    <template lwc:if={field.isDate}>
+                                        <lightning-input type="date" data-label={field.label} value={field.value} onchange={handleDynamicFieldChange}></lightning-input>
+                                    </template>
+                                    <template lwc:elseif={field.isAddress}>
+                                        <lightning-textarea data-label={field.label} value={field.value} onchange={handleDynamicFieldChange} placeholder={field.label} rows="3"></lightning-textarea>
+                                    </template>
+                                    <template lwc:elseif={field.isEmail}>
+                                        <lightning-input type="email" data-label={field.label} value={field.value} onchange={handleDynamicFieldChange} placeholder={field.label}></lightning-input>
+                                    </template>
+                                    <template lwc:elseif={field.isTel}>
+                                        <lightning-input type="tel" data-label={field.label} value={field.value} onchange={handleDynamicFieldChange} placeholder={field.label}></lightning-input>
+                                    </template>
+                                    <template lwc:else>
+                                        <lightning-input type="text" data-label={field.label} value={field.value} onchange={handleDynamicFieldChange} placeholder={field.label}></lightning-input>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="slds-m-top_small actions">
+                            <lightning-button variant="neutral" label="Cancel" onclick={handleCancelForm} disabled={isLoading}></lightning-button>
+                            <lightning-button variant="brand" label="Submit" onclick={handleSubmit} disabled={formInvalid} class="slds-m-left_x-small"></lightning-button>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Step 4: Related records panel -->
+                <template lwc:if={hasRelatedPanel}>
+                    <h3 class="slds-text-heading_small slds-m-bottom_small">Related records</h3>
+                    <div class="related-records-panel">
+                        <template lwc:if={isAccountContext}>
+                            <template lwc:if={relatedLoans.length}>
+                                <div class="related-table-block">
+                                    <div class="slds-text-title slds-m-bottom_xx-small">Loans</div>
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped related-table">
+                                        <thead><tr><th scope="col">Name</th><th scope="col">Amount / Status</th></tr></thead>
+                                        <tbody>
+                                            <template for:each={relatedLoans} for:item="loan">
+                                                <tr key={loan.Id}>
+                                                    <td>{loan.Name}</td>
+                                                    <td>{loan.Principal_Amount__c} / {loan.Loan_Status__c}</td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </template>
+                            <template lwc:if={relatedDeposits.length}>
+                                <div class="related-table-block">
+                                    <div class="slds-text-title slds-m-bottom_xx-small">Deposits</div>
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped related-table">
+                                        <thead><tr><th scope="col">Name</th><th scope="col">Type / Balance</th></tr></thead>
+                                        <tbody>
+                                            <template for:each={relatedDeposits} for:item="dep">
+                                                <tr key={dep.Id}>
+                                                    <td>{dep.Name}</td>
+                                                    <td>{dep.Deposit_Type__c} / {dep.Balance__c}</td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </template>
+                        </template>
+                        <template lwc:if={isLoanContext}>
+                            <template lwc:if={relatedCollateral.length}>
+                                <div class="related-table-block">
+                                    <div class="slds-text-title slds-m-bottom_xx-small">Collateral</div>
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped related-table">
+                                        <thead><tr><th scope="col">Name</th><th scope="col">Type / Value</th></tr></thead>
+                                        <tbody>
+                                            <template for:each={relatedCollateral} for:item="col">
+                                                <tr key={col.Id}>
+                                                    <td>{col.Name}</td>
+                                                    <td>{col.Type__c} / {col.Value__c}</td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </template>
+
+                <!-- Step 5: Case list -->
+                <h3 class="slds-text-heading_small slds-m-top_medium slds-m-bottom_small">Related cases</h3>
+                <template lwc:if={casesLoading}>
+                    <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                </template>
+                <template lwc:elseif={relatedCases.length}>
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Subject</th>
+                                <th scope="col">Category</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Priority</th>
+                                <th scope="col">Created</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={relatedCases} for:item="c">
+                                <tr key={c.Id}>
+                                    <td>
+                                        <a href="#" data-case-id={c.Id} onclick={handleCaseNav} class="case-subject-link">{c.Subject}</a>
+                                    </td>
+                                    <td>{c.Service_Category__c}</td>
+                                    <td>{c.Status}</td>
+                                    <td>{c.Priority}</td>
+                                    <td>{formatDate(c.CreatedDate)}</td>
+                                    <td>
+                                        <template lwc:if={c.showClose}>
+                                            <lightning-button variant="neutral" label="Close" data-case-id={c.Id} onclick={handleCloseCase} title="Close case"></lightning-button>
+                                        </template>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </template>
+                <template lwc:else>
+                    <p class="slds-text-color_weak">No related cases.</p>
+                </template>
+            </template>
+            <template lwc:else>
+                <p class="slds-text-color_weak">Open an Account, Loan, or Deposit record to use this component.</p>
+            </template>
+            <template lwc:if={isLoading}>
+                <lightning-spinner alternative-text="Submitting..." size="small"></lightning-spinner>
+            </template>
+        </div>
+    </lightning-card>
+</template>

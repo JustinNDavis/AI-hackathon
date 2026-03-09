@@ -1,0 +1,58 @@
+.service-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.service-card {
+    cursor: pointer;
+    min-width: 180px;
+    transition: background-color 0.2s;
+}
+
+.service-card:hover {
+    background-color: #f3f3f3;
+}
+
+.form-section {
+    background-color: #fafaf9;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.case-subject-link {
+    color: var(--lwc-brandPrimary, #0176d3);
+    text-decoration: none;
+}
+
+.case-subject-link:hover {
+    text-decoration: underline;
+}
+
+/* Related records (Loans / Deposits) spacing on Account */
+.related-records-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.related-table-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.related-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.related-table th,
+.related-table td {
+    padding: 0.5rem 0.75rem;
+    vertical-align: middle;
+}

@@ -3,11 +3,11 @@
     <fullName>Account__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
     <description>Account (legal entity as borrower or guarantor) on the loan.</description>
-    <externalId>false</externalId>
     <label>Account</label>
     <referenceTo>Account</referenceTo>
     <relationshipLabel>Legal Entity Roles</relationshipLabel>
     <relationshipName>Account_Legal_Entities</relationshipName>
     <required>false</required>
+    <trackTrending>false</trackTrending>
     <type>Lookup</type>
 </CustomField>
