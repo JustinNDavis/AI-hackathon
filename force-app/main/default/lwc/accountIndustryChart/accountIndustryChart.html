@@ -1,0 +1,19 @@
+<template>
+    <lightning-card title="Accounts by Industry" icon-name="standard:chart">
+        <div class="slds-p-around_medium">
+            <template lwc:if={hasError}>
+                <div class="slds-text-color_error slds-m-bottom_small">{error}</div>
+            </template>
+            <template lwc:if={hasData}>
+                <div class="chart-container">
+                    <canvas class="industry-chart"></canvas>
+                </div>
+            </template>
+            <template lwc:elseif={hasError}>
+            </template>
+            <template lwc:else>
+                <p class="slds-text-color_weak">No account industry data to display.</p>
+            </template>
+        </div>
+    </lightning-card>
+</template>

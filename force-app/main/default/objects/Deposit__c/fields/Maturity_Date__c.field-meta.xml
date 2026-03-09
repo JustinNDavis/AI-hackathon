@@ -2,8 +2,8 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Maturity_Date__c</fullName>
     <description>Date the deposit matures (e.g. for term deposits or CDs).</description>
-    <externalId>false</externalId>
     <label>Maturity Date</label>
     <required>false</required>
+    <trackTrending>false</trackTrending>
     <type>Date</type>
 </CustomField>

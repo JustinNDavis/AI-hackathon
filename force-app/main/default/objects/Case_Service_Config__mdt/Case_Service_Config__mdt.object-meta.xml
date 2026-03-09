@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Configuration for case service types by object.</description>
+    <label>Case Service Config</label>
+    <pluralLabel>Case Service Configs</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>
