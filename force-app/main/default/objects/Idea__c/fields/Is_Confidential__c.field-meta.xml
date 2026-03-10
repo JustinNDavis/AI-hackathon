@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Is_Confidential__c</fullName>
+    <description>Marks whether the idea is confidential and should be restricted to creator and admins.</description>
+    <externalId>false</externalId>
+    <label>Is Confidential</label>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+    <defaultValue>false</defaultValue>
+</CustomField>
+

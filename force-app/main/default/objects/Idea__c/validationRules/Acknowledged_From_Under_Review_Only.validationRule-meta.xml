@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Acknowledged_From_Under_Review_Only</fullName>
+    <active>true</active>
+    <description>Acknowledged status is only allowed from Under Review.</description>
+    <errorConditionFormula>
+        ISPICKVAL(Status__c, "Acknowledged")
+        &amp;&amp;
+        NOT(ISPICKVAL(PRIORVALUE(Status__c), "Under Review"))
+    </errorConditionFormula>
+    <errorDisplayField>Status__c</errorDisplayField>
+    <errorMessage>Acknowledged is only allowed when moving from Under Review.</errorMessage>
+</ValidationRule>
+

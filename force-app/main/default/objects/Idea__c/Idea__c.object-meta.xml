@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description>Captures improvement ideas for customer or employee experience, with workflow, visibility, and resolution details.</description>
+    <enableActivities>true</enableActivities>
+    <enableHistory>true</enableHistory>
+    <label>Idea</label>
+    <nameField>
+        <displayFormat>IDEA-{00000}</displayFormat>
+        <label>Idea Number</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>Ideas</pluralLabel>
+    <sharingModel>Private</sharingModel>
+</CustomObject>
+

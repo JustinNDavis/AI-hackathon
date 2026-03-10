@@ -1,0 +1,88 @@
+<template>
+    <lightning-card title="Submit an Idea" icon-name="standard:strategy">
+        <div class="slds-p-around_medium">
+            <lightning-messages></lightning-messages>
+            <div class="slds-grid slds-wrap slds-g-horizontal_x-small">
+                <div class="slds-col slds-size_1-of-1">
+                    <lightning-input
+                        type="text"
+                        label="Title"
+                        value={title}
+                        onchange={handleTitleChange}
+                        required>
+                    </lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-m-top_small">
+                    <lightning-textarea
+                        label="Description"
+                        value={description}
+                        onchange={handleDescriptionChange}
+                        required>
+                    </lightning-textarea>
+                    <p class="helper-text">Please include at least five words describing the idea and its impact.</p>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-m-top_small">
+                    <lightning-dual-listbox
+                        name="improvementType"
+                        label="Improvement Type"
+                        source-label="Available"
+                        selected-label="Selected"
+                        field-level-help="Select one or more improvement types."
+                        options={improvementTypeOptions}
+                        value={improvementType}
+                        onchange={handleImprovementTypeChange}>
+                    </lightning-dual-listbox>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-m-top_small">
+                    <lightning-input
+                        type="text"
+                        label="Customer / Employee Impact"
+                        value={customerImpact}
+                        onchange={handleCustomerImpactChange}>
+                    </lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-m-top_small">
+                    <lightning-input
+                        type="text"
+                        label="Tags"
+                        value={tags}
+                        onchange={handleTagsChange}
+                        message-toggle-active="Use semicolons to separate tags.">
+                    </lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-2 slds-m-top_small">
+                    <lightning-combobox
+                        name="visibility"
+                        label="Visibility"
+                        value={visibility}
+                        options={visibilityOptions}
+                        onchange={handleVisibilityChange}>
+                    </lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-2 slds-m-top_small slds-p-top_large">
+                    <lightning-input
+                        type="checkbox"
+                        label="This idea is confidential"
+                        checked={isConfidential}
+                        onchange={handleConfidentialChange}>
+                    </lightning-input>
+                </div>
+            </div>
+            <div class="slds-m-top_large slds-text-align_right">
+                <lightning-button
+                    label="Cancel"
+                    variant="neutral"
+                    onclick={handleCancel}>
+                </lightning-button>
+                <lightning-button
+                    class="slds-m-left_small"
+                    label="Submit Idea"
+                    variant="brand"
+                    onclick={handleSubmit}
+                    disabled={submitting}>
+                </lightning-button>
+            </div>
+        </div>
+    </lightning-card>
+</template>
+
