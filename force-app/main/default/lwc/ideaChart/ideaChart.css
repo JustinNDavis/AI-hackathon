@@ -1,0 +1,24 @@
+.chart-card {
+    --slds-c-card-body-spacing-block-start: 1.25rem;
+    --slds-c-card-body-spacing-block-end: 1.25rem;
+    --slds-c-card-body-spacing-inline-start: 1.25rem;
+    --slds-c-card-body-spacing-inline-end: 1.25rem;
+}
+
+.chart-container {
+    position: relative;
+    min-height: 220px;
+    padding: 0.5rem 0;
+}
+
+.chart-container canvas {
+    max-width: 100%;
+}
+
+.chart-error,
+.chart-empty {
+    font-size: 0.875rem;
+    color: var(--lwc-colorTextWeak, #706e6b);
+    margin: 1rem 0 0 0;
+    padding: 0;
+}

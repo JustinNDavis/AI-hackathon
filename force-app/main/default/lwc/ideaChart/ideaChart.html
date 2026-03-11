@@ -1,0 +1,15 @@
+<template>
+    <lightning-card title="Ideas by Stage" icon-name="standard:chart" class="chart-card">
+        <template if:true={error}>
+            <p class="chart-error">{errorMessage}</p>
+        </template>
+        <template if:false={error}>
+            <template if:true={isEmpty}>
+                <p class="chart-empty">No ideas to display yet.</p>
+            </template>
+            <template if:false={isEmpty}>
+                <div class="chart-container" lwc:dom="manual"></div>
+            </template>
+        </template>
+    </lightning-card>
+</template>
