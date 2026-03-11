@@ -171,5 +171,23 @@ private class IdeaServiceTest {
         List<Idea__c> top = IdeaService.getTopIdeas(5);
         System.assert(top.size() >= 1, 'Should return at least one top idea');
     }
+
+    @IsTest
+    static void test_getIdeasByStatusForChart() {
+        IdeaService.createIdea('Chart test idea', 'This idea is for testing the chart data aggregation.', 'Open', null, null, null);
+
+        List<ChartDataPoint> points = IdeaService.getIdeasByStatusForChart();
+        System.assert(points != null, 'Chart data should not be null');
+        System.assert(points.size() >= 1, 'Should return at least one status (Submitted)');
+        ChartDataPoint submitted = null;
+        for (ChartDataPoint p : points) {
+            if (p.label == 'Submitted') {
+                submitted = p;
+                break;
+            }
+        }
+        System.assertNotEquals(null, submitted, 'Should have Submitted status');
+        System.assert(submitted.value >= 1, 'Submitted count should be at least 1');
+    }
 }
 

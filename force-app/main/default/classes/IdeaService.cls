@@ -279,6 +279,36 @@ public with sharing class IdeaService {
     }
 
     @AuraEnabled(cacheable=true)
+    public static List<ChartDataPoint> getIdeasByStatusForChart() {
+        Id userId = UserInfo.getUserId();
+        Boolean isAdmin = currentUserIsAdmin();
+        List<AggregateResult> results;
+        if (isAdmin) {
+            results = [SELECT Status__c, COUNT(Id) cnt FROM Idea__c GROUP BY Status__c];
+        } else {
+            results = [
+                SELECT Status__c, COUNT(Id) cnt
+                FROM Idea__c
+                WHERE CreatedById = :userId
+                    OR Owner__c = :userId
+                    OR Administrator__c = :userId
+                    OR (Visibility__c = 'Open' AND Is_Confidential__c = false)
+                GROUP BY Status__c
+            ];
+        }
+        List<ChartDataPoint> points = new List<ChartDataPoint>();
+        for (AggregateResult ar : results) {
+            String status = (String) ar.get('Status__c');
+            if (String.isBlank(status)) {
+                status = 'Unknown';
+            }
+            Integer cnt = (Integer) ar.get('cnt');
+            points.add(new ChartDataPoint(status, cnt));
+        }
+        return points;
+    }
+
+    @AuraEnabled(cacheable=true)
     public static List<Idea__c> getTopIdeas(Integer limitCount) {
         Integer lim = (limitCount == null || limitCount < 1) ? 5 : Math.min(limitCount, 20);
         Id userId = UserInfo.getUserId();
