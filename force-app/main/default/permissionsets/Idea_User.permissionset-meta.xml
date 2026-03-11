@@ -22,6 +22,15 @@
         <object>Idea_Comment__c</object>
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Idea_Vote__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
     <fieldPermissions>
         <editable>true</editable>
         <field>Idea__c.Description__c</field>
@@ -102,8 +111,27 @@
         <field>Idea_Comment__c.Parent_Comment__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Idea_Vote__c.Idea__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Idea_Vote__c.Voter__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Idea__c.Vote_Count__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <classAccesses>
         <apexClass>IdeaService</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>IdeaTestDataSeeder</apexClass>
         <enabled>true</enabled>
     </classAccesses>
 </PermissionSet>

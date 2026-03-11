@@ -68,50 +68,99 @@ public with sharing class IdeaService {
         List<Idea__c> ideas;
         if (normalizedScope == 'Admin' && isAdmin) {
             ideas = [
-                SELECT Id, Name, Title__c, Status__c, Owner__c, Owner__r.Name,
+                SELECT Id, Name, Title__c, Description__c, Status__c, Owner__c, Owner__r.Name,
                     Tags__c, LastModifiedDate, Visibility__c, Is_Confidential__c,
-                    Administrator__c, Administrator__r.Name
+                    Administrator__c, Administrator__r.Name, Vote_Count__c
                 FROM Idea__c
-                ORDER BY LastModifiedDate DESC
+                ORDER BY CreatedDate DESC
                 LIMIT 200
             ];
         } else if (normalizedScope == 'Visible') {
             if (isAdmin) {
                 ideas = [
-                    SELECT Id, Name, Title__c, Status__c, Owner__c, Owner__r.Name,
+                    SELECT Id, Name, Title__c, Description__c, Status__c, Owner__c, Owner__r.Name,
                         Tags__c, LastModifiedDate, Visibility__c, Is_Confidential__c,
-                        Administrator__c, Administrator__r.Name
+                        Administrator__c, Administrator__r.Name, Vote_Count__c
                     FROM Idea__c
-                    ORDER BY LastModifiedDate DESC
+                    ORDER BY CreatedDate DESC
                     LIMIT 200
                 ];
             } else {
                 ideas = [
-                    SELECT Id, Name, Title__c, Status__c, Owner__c, Owner__r.Name,
+                    SELECT Id, Name, Title__c, Description__c, Status__c, Owner__c, Owner__r.Name,
                         Tags__c, LastModifiedDate, Visibility__c, Is_Confidential__c,
-                        Administrator__c, Administrator__r.Name, CreatedById
+                        Administrator__c, Administrator__r.Name, CreatedById, Vote_Count__c
                     FROM Idea__c
                     WHERE
                         CreatedById = :userId
                         OR Owner__c = :userId
                         OR Administrator__c = :userId
                         OR (Visibility__c = 'Open' AND Is_Confidential__c = false)
-                    ORDER BY LastModifiedDate DESC
+                    ORDER BY CreatedDate DESC
                     LIMIT 200
                 ];
             }
         } else {
             ideas = [
-                SELECT Id, Name, Title__c, Status__c, Owner__c, Owner__r.Name,
+                SELECT Id, Name, Title__c, Description__c, Status__c, Owner__c, Owner__r.Name,
                     Tags__c, LastModifiedDate, Visibility__c, Is_Confidential__c,
-                    Administrator__c, Administrator__r.Name, CreatedById
+                    Administrator__c, Administrator__r.Name, CreatedById, Vote_Count__c
                 FROM Idea__c
                 WHERE CreatedById = :userId OR Owner__c = :userId
-                ORDER BY LastModifiedDate DESC
+                ORDER BY CreatedDate DESC
                 LIMIT 200
             ];
         }
         return ideas;
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static IdeaListResult listIdeasPaginated(String scope, Integer pageNumber, Integer pageSize) {
+        Integer pn = (pageNumber == null || pageNumber < 1) ? 1 : pageNumber;
+        Integer ps = (pageSize == null || pageSize < 1) ? 10 : Math.min(pageSize, 50);
+        Integer offset = (pn - 1) * ps;
+
+        String normalizedScope = String.isBlank(scope) ? 'My' : scope;
+        Id userId = UserInfo.getUserId();
+        Boolean isAdmin = currentUserIsAdmin();
+
+        String baseFields = 'Id, Name, Title__c, Description__c, Status__c, Owner__c, Owner__r.Name, Tags__c, LastModifiedDate, Visibility__c, Is_Confidential__c, Administrator__c, Administrator__r.Name, Vote_Count__c';
+        String whereClause = '';
+        if (normalizedScope == 'Admin' && isAdmin) {
+            whereClause = '';
+        } else if (normalizedScope == 'Visible') {
+            if (!isAdmin) {
+                whereClause = ' WHERE (CreatedById = :userId OR Owner__c = :userId OR Administrator__c = :userId OR (Visibility__c = \'Open\' AND Is_Confidential__c = false))';
+            }
+        } else {
+            whereClause = ' WHERE (CreatedById = :userId OR Owner__c = :userId)';
+        }
+
+        Integer totalCount = 0;
+        if (normalizedScope == 'Admin' && isAdmin) {
+            totalCount = [SELECT COUNT() FROM Idea__c];
+        } else if (normalizedScope == 'Visible' && isAdmin) {
+            totalCount = [SELECT COUNT() FROM Idea__c];
+        } else if (normalizedScope == 'Visible') {
+            totalCount = [SELECT COUNT() FROM Idea__c WHERE CreatedById = :userId OR Owner__c = :userId OR Administrator__c = :userId OR (Visibility__c = 'Open' AND Is_Confidential__c = false)];
+        } else {
+            totalCount = [SELECT COUNT() FROM Idea__c WHERE CreatedById = :userId OR Owner__c = :userId];
+        }
+
+        List<Idea__c> ideas;
+        if (normalizedScope == 'Admin' && isAdmin) {
+            ideas = Database.query('SELECT ' + baseFields + ' FROM Idea__c ORDER BY CreatedDate DESC LIMIT :ps OFFSET :offset');
+        } else if (normalizedScope == 'Visible') {
+            if (isAdmin) {
+                ideas = Database.query('SELECT ' + baseFields + ' FROM Idea__c ORDER BY CreatedDate DESC LIMIT :ps OFFSET :offset');
+            } else {
+                ideas = Database.query('SELECT ' + baseFields + ', CreatedById FROM Idea__c' + whereClause + ' ORDER BY CreatedDate DESC LIMIT :ps OFFSET :offset');
+            }
+        } else {
+            ideas = Database.query('SELECT ' + baseFields + ', CreatedById FROM Idea__c' + whereClause + ' ORDER BY CreatedDate DESC LIMIT :ps OFFSET :offset');
+        }
+
+        return new IdeaListResult(ideas, totalCount);
     }
 
     @AuraEnabled
@@ -176,6 +225,85 @@ public with sharing class IdeaService {
             WHERE Idea__c = :ideaId
             ORDER BY CreatedDate ASC
         ];
+    }
+
+    @AuraEnabled
+    public static void voteIdea(Id ideaId) {
+        if (ideaId == null) {
+            throw new AuraHandledException('Idea Id is required.');
+        }
+        if (!canSeeIdea(ideaId)) {
+            throw new AuraHandledException('You do not have access to this idea.');
+        }
+        Id userId = UserInfo.getUserId();
+        List<Idea_Vote__c> existing = [
+            SELECT Id FROM Idea_Vote__c
+            WHERE Idea__c = :ideaId AND Voter__c = :userId
+            LIMIT 1
+        ];
+        if (!existing.isEmpty()) {
+            throw new AuraHandledException('You have already voted for this idea.');
+        }
+        Idea_Vote__c vote = new Idea_Vote__c();
+        vote.Idea__c = ideaId;
+        vote.Voter__c = userId;
+        insert vote;
+    }
+
+    @AuraEnabled
+    public static void unvoteIdea(Id ideaId) {
+        if (ideaId == null) {
+            throw new AuraHandledException('Idea Id is required.');
+        }
+        Id userId = UserInfo.getUserId();
+        delete [
+            SELECT Id FROM Idea_Vote__c
+            WHERE Idea__c = :ideaId AND Voter__c = :userId
+        ];
+    }
+
+    @AuraEnabled
+    public static List<Id> getIdeasUserHasVotedFor(List<Id> ideaIds) {
+        if (ideaIds == null || ideaIds.isEmpty()) {
+            return new List<Id>();
+        }
+        Id userId = UserInfo.getUserId();
+        List<Id> voted = new List<Id>();
+        for (Idea_Vote__c v : [
+            SELECT Idea__c FROM Idea_Vote__c
+            WHERE Idea__c IN :ideaIds AND Voter__c = :userId
+        ]) {
+            voted.add(v.Idea__c);
+        }
+        return voted;
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<Idea__c> getTopIdeas(Integer limitCount) {
+        Integer lim = (limitCount == null || limitCount < 1) ? 5 : Math.min(limitCount, 20);
+        Id userId = UserInfo.getUserId();
+        Boolean isAdmin = currentUserIsAdmin();
+        List<Idea__c> ideas;
+        if (isAdmin) {
+            ideas = [
+                SELECT Id, Name, Title__c, Status__c, Vote_Count__c, Owner__r.Name, Description__c
+                FROM Idea__c
+                WHERE Vote_Count__c > 0
+                ORDER BY Vote_Count__c DESC, LastModifiedDate DESC
+                LIMIT :lim
+            ];
+        } else {
+            ideas = [
+                SELECT Id, Name, Title__c, Status__c, Vote_Count__c, Owner__r.Name, Description__c
+                FROM Idea__c
+                WHERE Vote_Count__c > 0
+                    AND (CreatedById = :userId OR Owner__c = :userId OR Administrator__c = :userId
+                        OR (Visibility__c = 'Open' AND Is_Confidential__c = false))
+                ORDER BY Vote_Count__c DESC, LastModifiedDate DESC
+                LIMIT :lim
+            ];
+        }
+        return ideas;
     }
 
     private static Boolean canSeeIdea(Id ideaId) {

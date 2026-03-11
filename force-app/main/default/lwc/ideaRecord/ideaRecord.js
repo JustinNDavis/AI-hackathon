@@ -113,6 +113,23 @@ export default class IdeaRecord extends LightningElement {
         this.refreshComments();
     }
 
+    refreshComments() {
+        if (!this.recordId) return;
+        listComments({ ideaId: this.recordId })
+            .then((rows) => {
+                const enriched = (rows || []).map((c) => ({
+                    ...c,
+                    formattedTime: this.formatRelativeTime(c.CreatedDate),
+                    initials: this.getInitials(c.Created_By__r?.Name || ''),
+                    children: []
+                }));
+                this.comments = this.buildCommentTree(enriched);
+            })
+            .catch(() => {
+                this.comments = [];
+            });
+    }
+
     get closeOptions() {
         return [
             { label: 'Under Review', value: 'Under Review' },
@@ -130,25 +147,6 @@ export default class IdeaRecord extends LightningElement {
             })
             .catch(() => {
                 this.isAdmin = false;
-            });
-    }
-
-    refreshComments() {
-        if (!this.recordId) {
-            return;
-        }
-        listComments({ ideaId: this.recordId })
-            .then((rows) => {
-                const enriched = (rows || []).map((c) => ({
-                    ...c,
-                    formattedTime: this.formatRelativeTime(c.CreatedDate),
-                    initials: this.getInitials(c.Created_By__r?.Name || ''),
-                    children: []
-                }));
-                this.comments = this.buildCommentTree(enriched);
-            })
-            .catch(() => {
-                this.comments = [];
             });
     }
 

@@ -132,5 +132,44 @@ private class IdeaServiceTest {
         System.assertEquals(commentId, reply.Parent_Comment__c);
         System.assertEquals('I agree, let us prioritize.', reply.Body__c);
     }
+
+    @IsTest
+    static void test_voteAndUnvote() {
+        Id ideaId = IdeaService.createIdea('Vote test idea', 'This idea tests the voting feature with enough words.', 'Open', null, null, null);
+
+        Test.startTest();
+        IdeaService.voteIdea(ideaId);
+        List<Id> voted = IdeaService.getIdeasUserHasVotedFor(new List<Id>{ ideaId });
+        System.assertEquals(1, voted.size(), 'User should have voted for the idea');
+        System.assertEquals(ideaId, voted[0]);
+
+        IdeaService.unvoteIdea(ideaId);
+        voted = IdeaService.getIdeasUserHasVotedFor(new List<Id>{ ideaId });
+        System.assertEquals(0, voted.size(), 'User should have no votes after unvote');
+        Test.stopTest();
+    }
+
+    @IsTest
+    static void test_voteTwiceThrows() {
+        Id ideaId = IdeaService.createIdea('Double vote test', 'This idea tests that double voting is prevented.', 'Open', null, null, null);
+        IdeaService.voteIdea(ideaId);
+
+        Boolean threw = false;
+        try {
+            IdeaService.voteIdea(ideaId);
+        } catch (AuraHandledException e) {
+            threw = true;
+        }
+        System.assert(threw, 'Expected error when voting twice');
+    }
+
+    @IsTest
+    static void test_getTopIdeas() {
+        Id ideaId = IdeaService.createIdea('Top idea test', 'This idea has votes for top ideas test.', 'Open', null, null, null);
+        insert new Idea_Vote__c(Idea__c = ideaId, Voter__c = UserInfo.getUserId());
+
+        List<Idea__c> top = IdeaService.getTopIdeas(5);
+        System.assert(top.size() >= 1, 'Should return at least one top idea');
+    }
 }
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Idea__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>The idea being voted for.</description>
+    <externalId>false</externalId>
+    <label>Idea</label>
+    <referenceTo>Idea__c</referenceTo>
+    <relationshipLabel>Votes</relationshipLabel>
+    <relationshipName>Votes</relationshipName>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>
