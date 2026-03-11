@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Description_Min_Words</fullName>
+    <active>true</active>
+    <description>Require at least five words in Description.</description>
+    <errorConditionFormula>
+        NOT(ISBLANK(Description__c)) &amp;&amp;
+        (LEN(Description__c) - LEN(SUBSTITUTE(Description__c, " ", "")) + 1) &lt; 5
+    </errorConditionFormula>
+    <errorDisplayField>Description__c</errorDisplayField>
+    <errorMessage>Description must contain at least five words.</errorMessage>
+</ValidationRule>
+

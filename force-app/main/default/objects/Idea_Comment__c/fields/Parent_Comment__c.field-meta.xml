@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Parent_Comment__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Parent comment when this is a reply. Null for top-level comments.</description>
+    <externalId>false</externalId>
+    <label>Parent Comment</label>
+    <referenceTo>Idea_Comment__c</referenceTo>
+    <relationshipLabel>Replies</relationshipLabel>
+    <relationshipName>Replies</relationshipName>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

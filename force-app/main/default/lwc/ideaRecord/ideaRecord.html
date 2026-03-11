@@ -1,0 +1,155 @@
+<template>
+    <lightning-card title="Idea Details" icon-name="standard:strategy" class="idea-record-card">
+        <div class="idea-record-wrapper slds-p-around_medium">
+            <lightning-messages></lightning-messages>
+            <template if:true={idea}>
+                <div class="status-section">
+                    <lightning-progress-indicator current-step={idea.Status__c} type="path" variant="base">
+                        <lightning-progress-step label="Submitted" value="Submitted"></lightning-progress-step>
+                        <lightning-progress-step label="Under Review" value="Under Review"></lightning-progress-step>
+                        <lightning-progress-step label="In Progress" value="In Progress"></lightning-progress-step>
+                        <lightning-progress-step label="Implemented" value="Implemented"></lightning-progress-step>
+                        <lightning-progress-step label="Acknowledged" value="Acknowledged"></lightning-progress-step>
+                        <lightning-progress-step label="Not Pursued" value="Not Pursued"></lightning-progress-step>
+                    </lightning-progress-indicator>
+                </div>
+
+                <div class="record-grid slds-m-top_medium slds-grid slds-wrap">
+                    <div class="slds-col slds-size_2-of-3 slds-p-right_small">
+                        <div class="section-block">
+                            <h3 class="section-title">Idea</h3>
+                            <p class="field"><span class="label">Title:</span> {idea.Title__c}</p>
+                            <p class="field"><span class="label">Visibility:</span> {idea.Visibility__c}</p>
+                            <p class="field"><span class="label">Improvement Type:</span> {idea.Improvement_Type__c}</p>
+                            <p class="field"><span class="label">Impact:</span> {idea.Customer_Impact__c}</p>
+                            <p class="field"><span class="label">Tags:</span></p>
+                            <template if:true={hasTags}>
+                                <div class="tag-pills">
+                                    <template for:each={tagsList} for:item="tag">
+                                        <span key={tag.id} class="tag-pill">{tag.label}</span>
+                                    </template>
+                                </div>
+                            </template>
+                            <template if:false={hasTags}>
+                                <p class="field-value-empty">—</p>
+                            </template>
+                            <p class="field"><span class="label">Description:</span></p>
+                            <p class="description-content">{idea.Description__c}</p>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3 slds-p-left_small sidebar-col">
+                        <div class="section-block">
+                            <h3 class="section-title">Collaborators</h3>
+                            <p class="field"><span class="label">Owner:</span> {ownerName}</p>
+                            <p class="field"><span class="label">Administrator:</span> {adminName}</p>
+                        </div>
+                        <div class="section-block section-block-attachments">
+                            <h3 class="section-title">Attachments</h3>
+                            <lightning-file-upload
+                                label="Attach files"
+                                record-id={recordId}
+                                onuploadfinished={handleFilesUploaded}>
+                            </lightning-file-upload>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="record-grid slds-m-top_large slds-grid slds-wrap">
+                    <div class="slds-col slds-size_1-of-1">
+                        <div class="section-block">
+                            <h3 class="section-title">Comments</h3>
+                            <template if:true={hasComments}>
+                                <div class="comment-threads">
+                                    <template for:each={comments} for:item="c">
+                                        <c-idea-comment-thread
+                                            key={c.Id}
+                                            comment={c}
+                                            idea-id={recordId}
+                                            can-comment={canComment}
+                                            onrefresh={handleCommentsRefresh}>
+                                        </c-idea-comment-thread>
+                                    </template>
+                                </div>
+                            </template>
+                            <template if:false={hasComments}>
+                                <p class="record-empty">No comments yet.</p>
+                            </template>
+                            <template if:true={canComment}>
+                                <lightning-textarea
+                                    class="slds-m-top_small"
+                                    label="Add a comment"
+                                    value={newComment}
+                                    onchange={handleCommentChange}>
+                                </lightning-textarea>
+                                <div class="slds-m-top_small slds-text-align_right">
+                                    <lightning-button
+                                        variant="brand"
+                                        label="Add Comment"
+                                        onclick={handleAddComment}
+                                        disabled={addingComment}>
+                                    </lightning-button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <template if:true={isAdmin}>
+                    <div class="slds-m-top_large admin-panel">
+                        <h3 class="section-title">Admin Panel</h3>
+                        <lightning-button
+                            variant="brand-outline"
+                            label="Close / Update Status"
+                            onclick={openCloseModal}>
+                        </lightning-button>
+                        <template if:true={idea.Resolution_Notes__c}>
+                            <p class="field slds-m-top_small">
+                                <span class="label">Resolution Notes:</span> {idea.Resolution_Notes__c}
+                            </p>
+                        </template>
+                    </div>
+                </template>
+
+                <template if:true={showCloseModal}>
+                    <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <header class="slds-modal__header">
+                                <h2 class="slds-modal__title">Close / Update Idea</h2>
+                            </header>
+                            <div class="slds-modal__content slds-p-around_medium">
+                                <lightning-radio-group
+                                    name="closeStatus"
+                                    label="Outcome"
+                                    options={closeOptions}
+                                    value={closeStatus}
+                                    onchange={handleCloseStatusChange}>
+                                </lightning-radio-group>
+                                <lightning-textarea
+                                    class="slds-m-top_small"
+                                    label="Resolution Notes"
+                                    value={closeNotes}
+                                    onchange={handleCloseNotesChange}>
+                                </lightning-textarea>
+                            </div>
+                            <footer class="slds-modal__footer">
+                                <lightning-button
+                                    label="Cancel"
+                                    variant="neutral"
+                                    onclick={closeCloseModal}>
+                                </lightning-button>
+                                <lightning-button
+                                    class="slds-m-left_small"
+                                    label="Save"
+                                    variant="brand"
+                                    onclick={handleCloseSave}
+                                    disabled={savingClose}>
+                                </lightning-button>
+                            </footer>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>

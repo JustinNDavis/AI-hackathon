@@ -1,0 +1,146 @@
+<template>
+    <lightning-card title="Ideas" icon-name="standard:strategy" class="ideas-card">
+        <div class="content-wrap">
+            <div class="scope-row slds-grid slds-wrap slds-gutters">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                    <lightning-combobox
+                        name="scope"
+                        label="View"
+                        value={scope}
+                        options={scopeOptions}
+                        onchange={handleScopeChange}
+                        class="scope-select">
+                    </lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-m-top_small slds-medium-m-top_none">
+                    <lightning-combobox
+                        name="pageSize"
+                        label="Per page"
+                        value={pageSizeStr}
+                        options={pageSizeOptions}
+                        onchange={handlePageSizeChange}
+                        class="page-size-select">
+                    </lightning-combobox>
+                </div>
+            </div>
+
+            <!-- Top 5 cards -->
+            <template if:true={hasTopIdeas}>
+                <section class="top-ideas-section slds-m-bottom_large">
+                    <h3 class="top-ideas-title">Top Ideas</h3>
+                    <div class="top-ideas-grid">
+                        <template for:each={topIdeas} for:item="idea">
+                            <div key={idea.Id} class="idea-card" onclick={handleCardClick} data-id={idea.Id}>
+                                <div class="idea-card-votes">
+                                    <span class="idea-card-vote-count">{idea.Vote_Count__c}</span>
+                                    <span class="idea-card-vote-label">votes</span>
+                                </div>
+                                <div class="idea-card-body">
+                                    <h4 class="idea-card-title">{idea.Title__c}</h4>
+                                    <p class="idea-card-meta">{idea.ownerName} · {idea.Status__c}</p>
+                                    <p class="idea-card-desc">{idea.descriptionSnippet}</p>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </section>
+            </template>
+
+            <template if:true={error}>
+                <div class="slds-m-bottom_medium">
+                    <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+                        <span class="slds-assistive-text">Error</span>
+                        <h2>{errorMessage}</h2>
+                    </div>
+                </div>
+            </template>
+
+            <template if:false={error}>
+                <template if:true={hasIdeas}>
+                    <section class="idea-list-section">
+                        <h3 class="idea-list-title">All Ideas</h3>
+                        <div class="idea-list">
+                        <template for:each={ideas} for:item="idea">
+                            <article key={idea.Id} class="idea-row">
+                                <div class="idea-row-votes">
+                                    <span class="idea-row-vote-num">{idea.Vote_Count__c}</span>
+                                    <span class="idea-row-vote-txt">votes</span>
+                                </div>
+                                <div class="idea-row-main" data-id={idea.Id} onclick={handleIdeaClick}>
+                                    <div class="idea-row-header">
+                                        <span class="idea-row-id" if:true={idea.Name}>{idea.Name}</span>
+                                        <h4 class="idea-row-title">{idea.Title__c}</h4>
+                                    </div>
+                                    <div class="idea-row-meta">
+                                        <span class="idea-row-owner">{idea.ownerName}</span>
+                                        <span class="idea-row-dot">·</span>
+                                        <span class="idea-row-status">{idea.Status__c}</span>
+                                        <span class="idea-row-dot">·</span>
+                                        <span class="idea-row-date">{idea.formattedDate}</span>
+                                    </div>
+                                    <p class="idea-row-desc" if:true={idea.descriptionSnippet}>{idea.descriptionSnippet}</p>
+                                </div>
+                                <div class="idea-row-actions">
+                                    <template if:true={idea.hasVoted}>
+                                        <lightning-button
+                                            label="Unvote"
+                                            variant="neutral"
+                                            class="idea-action-btn"
+                                            data-id={idea.Id}
+                                            onclick={handleUnvoteClick}>
+                                        </lightning-button>
+                                    </template>
+                                    <template if:false={idea.hasVoted}>
+                                        <lightning-button
+                                            label="Vote"
+                                            variant="brand"
+                                            class="idea-action-btn"
+                                            data-id={idea.Id}
+                                            onclick={handleVoteClick}>
+                                        </lightning-button>
+                                    </template>
+                                    <lightning-button
+                                        label="Open"
+                                        variant="neutral"
+                                        class="idea-action-btn"
+                                        data-id={idea.Id}
+                                        onclick={handleOpenClick}>
+                                    </lightning-button>
+                                </div>
+                            </article>
+                        </template>
+                        </div>
+                        <template if:true={totalCount}>
+                            <div class="pagination-bar slds-m-top_medium">
+                                <span class="pagination-info">{pageInfo}</span>
+                                <div class="pagination-buttons">
+                                    <lightning-button
+                                        label="Previous"
+                                        icon-name="utility:chevronleft"
+                                        variant="neutral"
+                                        disabled={prevDisabled}
+                                        onclick={handlePrevPage}>
+                                    </lightning-button>
+                                    <lightning-button
+                                        label="Next"
+                                        icon-name="utility:chevronright"
+                                        icon-position="right"
+                                        variant="neutral"
+                                        disabled={nextDisabled}
+                                        onclick={handleNextPage}>
+                                    </lightning-button>
+                                </div>
+                            </div>
+                        </template>
+                    </section>
+                </template>
+                <template if:false={hasIdeas}>
+                    <div class="empty-state">
+                        <p class="empty-state-text">No ideas match your current view.</p>
+                        <p class="empty-state-hint">Try changing the scope or submit a new idea.</p>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>

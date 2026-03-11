@@ -1,0 +1,112 @@
+<template>
+    <div class="ios-container">
+        <lightning-messages></lightning-messages>
+
+        <header class="ios-header">
+            <h1 class="ios-title">New Idea</h1>
+            <p class="ios-subtitle">Share your improvement suggestion</p>
+        </header>
+
+        <section class="ios-section">
+            <h2 class="ios-section-title">Details</h2>
+            <div class="ios-card">
+                <div class="ios-field">
+                    <label class="ios-label">Title <abbr class="ios-required" title="required">*</abbr></label>
+                    <lightning-input
+                        type="text"
+                        class="ios-input"
+                        value={title}
+                        onchange={handleTitleChange}
+                        variant="label-hidden"
+                        placeholder="What's your idea?"
+                        required>
+                    </lightning-input>
+                </div>
+                <div class="ios-field ios-field-textarea">
+                    <label class="ios-label">Description <abbr class="ios-required" title="required">*</abbr></label>
+                    <lightning-textarea
+                        class="ios-textarea"
+                        value={description}
+                        onchange={handleDescriptionChange}
+                        variant="label-hidden"
+                        placeholder="Describe your idea and its impact (at least 5 words)..."
+                        required>
+                    </lightning-textarea>
+                    <span class="ios-hint">Include at least five words describing the idea and its impact.</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="ios-section">
+            <h2 class="ios-section-title">Classification</h2>
+            <div class="ios-card">
+                <div class="ios-field">
+                    <lightning-dual-listbox
+                        name="improvementType"
+                        label="Improvement Type"
+                        source-label="Available"
+                        selected-label="Selected"
+                        options={improvementTypeOptions}
+                        value={improvementType}
+                        onchange={handleImprovementTypeChange}>
+                    </lightning-dual-listbox>
+                </div>
+                <div class="ios-field">
+                    <lightning-input
+                        type="text"
+                        label="Customer / Employee Impact"
+                        value={customerImpact}
+                        onchange={handleCustomerImpactChange}
+                        placeholder="How does this help?">
+                    </lightning-input>
+                </div>
+                <div class="ios-field">
+                    <label class="ios-label">Tags</label>
+                    <div class="ios-tag-wrapper">
+                        <template for:each={tagsWithKey} for:item="tag">
+                            <span key={tag.id} class="ios-tag-pill">
+                                {tag.label}
+                                <button type="button" class="ios-tag-remove" data-index={tag.index} onclick={handleRemoveTag} aria-label="Remove tag">×</button>
+                            </span>
+                        </template>
+                        <input
+                            type="text"
+                            class="ios-tag-input"
+                            placeholder="Type a tag, press Enter"
+                            value={tagInput}
+                            oninput={handleTagInputChange}
+                            onkeydown={handleTagKeyDown}
+                        />
+                    </div>
+                    <span class="ios-hint">Press Enter or comma to add each tag.</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="ios-section">
+            <h2 class="ios-section-title">Visibility</h2>
+            <div class="ios-card">
+                <div class="ios-field">
+                    <lightning-combobox
+                        name="visibility"
+                        label="Who can see this idea"
+                        value={visibility}
+                        options={visibilityOptions}
+                        onchange={handleVisibilityChange}
+                        dropdown-alignment="auto">
+                    </lightning-combobox>
+                </div>
+            </div>
+        </section>
+
+        <div class="ios-actions">
+            <lightning-button
+                label="Submit Idea"
+                variant="brand"
+                class="ios-btn ios-btn-primary"
+                onclick={handleSubmit}
+                disabled={submitting}>
+            </lightning-button>
+        </div>
+    </div>
+</template>

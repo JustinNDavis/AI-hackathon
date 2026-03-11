@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Customer_Impact__c</fullName>
+    <description>Summary of expected customer or employee impact.</description>
+    <externalId>false</externalId>
+    <label>Customer / Employee Impact</label>
+    <length>255</length>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+</CustomField>
+

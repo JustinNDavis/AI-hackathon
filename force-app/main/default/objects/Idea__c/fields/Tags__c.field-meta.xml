@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Tags__c</fullName>
+    <description>Free-form tags or keywords; separate with semicolons.</description>
+    <externalId>false</externalId>
+    <label>Tags</label>
+    <length>255</length>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+</CustomField>
+
