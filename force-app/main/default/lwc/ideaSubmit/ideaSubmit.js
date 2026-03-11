@@ -112,6 +112,7 @@ export default class IdeaSubmit extends LightningElement {
                         variant: 'success'
                     })
                 );
+                this.handleCancel();
             })
             .catch((error) => {
                 const message = error?.body?.message || error.message || 'Error submitting idea.';

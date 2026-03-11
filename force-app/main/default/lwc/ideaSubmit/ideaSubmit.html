@@ -11,7 +11,7 @@
             <h2 class="ios-section-title">Details</h2>
             <div class="ios-card">
                 <div class="ios-field">
-                    <label class="ios-label">Title</label>
+                    <label class="ios-label">Title <abbr class="ios-required" title="required">*</abbr></label>
                     <lightning-input
                         type="text"
                         class="ios-input"
@@ -23,7 +23,7 @@
                     </lightning-input>
                 </div>
                 <div class="ios-field ios-field-textarea">
-                    <label class="ios-label">Description</label>
+                    <label class="ios-label">Description <abbr class="ios-required" title="required">*</abbr></label>
                     <lightning-textarea
                         class="ios-textarea"
                         value={description}
@@ -92,7 +92,8 @@
                         label="Who can see this idea"
                         value={visibility}
                         options={visibilityOptions}
-                        onchange={handleVisibilityChange}>
+                        onchange={handleVisibilityChange}
+                        dropdown-alignment="auto">
                     </lightning-combobox>
                 </div>
             </div>
