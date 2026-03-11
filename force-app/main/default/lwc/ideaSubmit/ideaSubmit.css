@@ -155,24 +155,18 @@
 /* Action buttons - iOS style */
 .ios-actions {
     display: flex;
-    gap: 0.75rem;
+    justify-content: center;
     margin-top: 2rem;
     padding: 0 0.25rem;
 }
 
 .ios-btn {
-    flex: 1;
+    min-width: 10rem;
 }
 
 .ios-btn-primary {
     --slds-c-button-brand-color-background: var(--ios-blue);
     --slds-c-button-brand-color-background-hover: #0056b3;
     --slds-c-button-brand-color-background-active: #004494;
-    --slds-c-button-radius-border: var(--ios-radius-sm);
-}
-
-.ios-btn-secondary {
-    --slds-c-button-neutral-color-border: var(--ios-gray-3);
-    --slds-c-button-neutral-color-background: var(--ios-card-bg);
     --slds-c-button-radius-border: var(--ios-radius-sm);
 }
