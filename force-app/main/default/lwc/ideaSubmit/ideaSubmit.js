@@ -7,9 +7,9 @@ export default class IdeaSubmit extends LightningElement {
     @track description = '';
     @track improvementType = [];
     @track customerImpact = '';
-    @track tags = '';
+    @track tagsArray = [];
+    @track tagInput = '';
     @track visibility = 'Private';
-    @track isConfidential = false;
     @track submitting = false;
     @track ideaId;
 
@@ -24,10 +24,13 @@ export default class IdeaSubmit extends LightningElement {
 
     get visibilityOptions() {
         return [
-            { label: 'Private', value: 'Private' },
-            { label: 'Creator Selected', value: 'Creator Selected' },
-            { label: 'Open', value: 'Open' }
+            { label: 'Private (only you and admins)', value: 'Private' },
+            { label: 'Open (visible to everyone)', value: 'Open' }
         ];
+    }
+
+    get tagsWithKey() {
+        return (this.tagsArray || []).map((label, i) => ({ id: `tag-${i}-${label}`, label, index: i }));
     }
 
     handleTitleChange(event) {
@@ -46,16 +49,34 @@ export default class IdeaSubmit extends LightningElement {
         this.customerImpact = event.target.value;
     }
 
-    handleTagsChange(event) {
-        this.tags = event.target.value;
+    handleTagInputChange(event) {
+        this.tagInput = event.target.value;
+    }
+
+    handleTagKeyDown(event) {
+        if (event.key === 'Enter' || event.key === ',') {
+            event.preventDefault();
+            this.addTag();
+        }
+    }
+
+    addTag() {
+        const val = (this.tagInput || '').trim();
+        if (!val) return;
+        if (this.tagsArray.includes(val)) return;
+        this.tagsArray = [...this.tagsArray, val];
+        this.tagInput = '';
+    }
+
+    handleRemoveTag(event) {
+        const idx = parseInt(event.currentTarget.dataset.index, 10);
+        if (!isNaN(idx)) {
+            this.tagsArray = this.tagsArray.filter((_, i) => i !== idx);
+        }
     }
 
     handleVisibilityChange(event) {
         this.visibility = event.detail.value;
-    }
-
-    handleConfidentialChange(event) {
-        this.isConfidential = event.target.checked;
     }
 
     handleCancel() {
@@ -63,9 +84,9 @@ export default class IdeaSubmit extends LightningElement {
         this.description = '';
         this.improvementType = [];
         this.customerImpact = '';
-        this.tags = '';
+        this.tagsArray = [];
+        this.tagInput = '';
         this.visibility = 'Private';
-        this.isConfidential = false;
         this.ideaId = undefined;
     }
 
@@ -77,11 +98,10 @@ export default class IdeaSubmit extends LightningElement {
         createIdea({
             title: this.title,
             description: this.description,
-            isConfidential: this.isConfidential,
             visibility: this.visibility,
             improvementType: (this.improvementType || []).join(';'),
             customerImpact: this.customerImpact,
-            tags: this.tags
+            tags: (this.tagsArray || []).join(';')
         })
             .then((id) => {
                 this.ideaId = id;
@@ -135,15 +155,4 @@ export default class IdeaSubmit extends LightningElement {
         }
         return true;
     }
-
-    handleUploadFinished() {
-        this.dispatchEvent(
-            new ShowToastEvent({
-                title: 'Files uploaded',
-                message: 'Your file attachments were uploaded.',
-                variant: 'success'
-            })
-        );
-    }
 }
-

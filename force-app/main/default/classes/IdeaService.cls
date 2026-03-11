@@ -1,7 +1,7 @@
 public with sharing class IdeaService {
 
     @AuraEnabled
-    public static Id createIdea(String title, String description, Boolean isConfidential, String visibility, String improvementType, String customerImpact, String tags) {
+    public static Id createIdea(String title, String description, String visibility, String improvementType, String customerImpact, String tags) {
         if (String.isBlank(title)) {
             throw new AuraHandledException('Title is required.');
         }
@@ -15,7 +15,7 @@ public with sharing class IdeaService {
         Idea__c idea = new Idea__c();
         idea.Title__c = title;
         idea.Description__c = description;
-        idea.Is_Confidential__c = isConfidential == null ? false : isConfidential;
+        idea.Is_Confidential__c = false;
         idea.Visibility__c = String.isBlank(visibility) ? 'Private' : visibility;
         idea.Improvement_Type__c = improvementType;
         idea.Customer_Impact__c = customerImpact;
@@ -136,7 +136,7 @@ public with sharing class IdeaService {
     }
 
     @AuraEnabled
-    public static Id addComment(Id ideaId, String body) {
+    public static Id addComment(Id ideaId, String body, Id parentCommentId) {
         if (ideaId == null || String.isBlank(body)) {
             throw new AuraHandledException('Idea Id and comment body are required.');
         }
@@ -144,10 +144,20 @@ public with sharing class IdeaService {
             throw new AuraHandledException('You do not have access to this idea.');
         }
 
+        if (parentCommentId != null) {
+            Idea_Comment__c parent = [SELECT Id, Idea__c FROM Idea_Comment__c WHERE Id = :parentCommentId LIMIT 1];
+            if (parent.Idea__c != ideaId) {
+                throw new AuraHandledException('Parent comment must belong to the same idea.');
+            }
+        }
+
         Idea_Comment__c comment = new Idea_Comment__c();
         comment.Idea__c = ideaId;
         comment.Body__c = body;
         comment.Created_By__c = UserInfo.getUserId();
+        if (parentCommentId != null) {
+            comment.Parent_Comment__c = parentCommentId;
+        }
         insert comment;
         return comment.Id;
     }
@@ -161,10 +171,10 @@ public with sharing class IdeaService {
             return new List<Idea_Comment__c>();
         }
         return [
-            SELECT Id, Body__c, CreatedDate, Created_By__c, Created_By__r.Name
+            SELECT Id, Body__c, CreatedDate, Created_By__c, Created_By__r.Name, Parent_Comment__c
             FROM Idea_Comment__c
             WHERE Idea__c = :ideaId
-            ORDER BY CreatedDate DESC
+            ORDER BY CreatedDate ASC
         ];
     }
 

@@ -4,7 +4,6 @@ import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
 import STATUS_FIELD from '@salesforce/schema/Idea__c.Status__c';
 import TITLE_FIELD from '@salesforce/schema/Idea__c.Title__c';
 import VISIBILITY_FIELD from '@salesforce/schema/Idea__c.Visibility__c';
-import CONFIDENTIAL_FIELD from '@salesforce/schema/Idea__c.Is_Confidential__c';
 import IMPROVEMENT_FIELD from '@salesforce/schema/Idea__c.Improvement_Type__c';
 import IMPACT_FIELD from '@salesforce/schema/Idea__c.Customer_Impact__c';
 import TAGS_FIELD from '@salesforce/schema/Idea__c.Tags__c';
@@ -23,7 +22,6 @@ const FIELDS = [
     STATUS_FIELD,
     TITLE_FIELD,
     VISIBILITY_FIELD,
-    CONFIDENTIAL_FIELD,
     IMPROVEMENT_FIELD,
     IMPACT_FIELD,
     TAGS_FIELD,
@@ -55,7 +53,6 @@ export default class IdeaRecord extends LightningElement {
                 Status__c: getFieldValue(data, STATUS_FIELD),
                 Title__c: getFieldValue(data, TITLE_FIELD),
                 Visibility__c: getFieldValue(data, VISIBILITY_FIELD),
-                Is_Confidential__c: getFieldValue(data, CONFIDENTIAL_FIELD),
                 Improvement_Type__c: getFieldValue(data, IMPROVEMENT_FIELD),
                 Customer_Impact__c: getFieldValue(data, IMPACT_FIELD),
                 Tags__c: getFieldValue(data, TAGS_FIELD),
@@ -82,10 +79,6 @@ export default class IdeaRecord extends LightningElement {
         this.refreshComments();
     }
 
-    get confidentialLabel() {
-        return this.idea && this.idea.Is_Confidential__c ? 'Yes' : 'No';
-    }
-
     get ownerName() {
         return this.idea && this.idea.Owner__r ? this.idea.Owner__r.Name : '';
     }
@@ -94,8 +87,30 @@ export default class IdeaRecord extends LightningElement {
         return this.idea && this.idea.Administrator__r ? this.idea.Administrator__r.Name : '';
     }
 
+    get tagsList() {
+        const raw = this.idea?.Tags__c;
+        if (!raw || typeof raw !== 'string') return [];
+        return raw
+            .split(';')
+            .map((t) => t.trim())
+            .filter((t) => t.length > 0)
+            .map((label, i) => ({ id: `tag-${i}-${label}`, label }));
+    }
+
+    get hasTags() {
+        return this.tagsList && this.tagsList.length > 0;
+    }
+
+    get hasComments() {
+        return this.comments && this.comments.length > 0;
+    }
+
     get canComment() {
         return true;
+    }
+
+    handleCommentsRefresh() {
+        this.refreshComments();
     }
 
     get closeOptions() {
@@ -124,15 +139,47 @@ export default class IdeaRecord extends LightningElement {
         }
         listComments({ ideaId: this.recordId })
             .then((rows) => {
-                this.comments = (rows || []).map((c) => ({
+                const enriched = (rows || []).map((c) => ({
                     ...c,
                     formattedTime: this.formatRelativeTime(c.CreatedDate),
-                    initials: this.getInitials(c.Created_By__r?.Name || '')
+                    initials: this.getInitials(c.Created_By__r?.Name || ''),
+                    children: []
                 }));
+                this.comments = this.buildCommentTree(enriched);
             })
             .catch(() => {
                 this.comments = [];
             });
+    }
+
+    buildCommentTree(flat) {
+        const byId = {};
+        flat.forEach((c) => {
+            byId[c.Id] = { ...c, children: [] };
+        });
+        const roots = [];
+        flat.forEach((c) => {
+            const node = byId[c.Id];
+            if (!c.Parent_Comment__c) {
+                roots.push(node);
+            } else {
+                const parent = byId[c.Parent_Comment__c];
+                if (parent) {
+                    parent.children.push(node);
+                } else {
+                    roots.push(node);
+                }
+            }
+        });
+        const sortChildren = (nodes) => {
+            nodes.sort((a, b) => new Date(a.CreatedDate) - new Date(b.CreatedDate));
+            nodes.forEach((n) => {
+                if (n.children?.length) sortChildren(n.children);
+            });
+        };
+        roots.sort((a, b) => new Date(b.CreatedDate) - new Date(a.CreatedDate));
+        roots.forEach((r) => sortChildren(r.children));
+        return roots;
     }
 
     formatRelativeTime(isoString) {
@@ -171,7 +218,7 @@ export default class IdeaRecord extends LightningElement {
             return;
         }
         this.addingComment = true;
-        addComment({ ideaId: this.recordId, body: this.newComment })
+        addComment({ ideaId: this.recordId, body: this.newComment, parentCommentId: null })
             .then(() => {
                 this.newComment = '';
                 this.refreshComments();

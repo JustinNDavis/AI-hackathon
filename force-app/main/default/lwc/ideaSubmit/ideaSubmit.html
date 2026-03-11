@@ -1,88 +1,117 @@
 <template>
-    <lightning-card title="Submit an Idea" icon-name="standard:strategy">
-        <div class="slds-p-around_medium">
-            <lightning-messages></lightning-messages>
-            <div class="slds-grid slds-wrap slds-g-horizontal_x-small">
-                <div class="slds-col slds-size_1-of-1">
+    <div class="ios-container">
+        <lightning-messages></lightning-messages>
+
+        <header class="ios-header">
+            <h1 class="ios-title">New Idea</h1>
+            <p class="ios-subtitle">Share your improvement suggestion</p>
+        </header>
+
+        <section class="ios-section">
+            <h2 class="ios-section-title">Details</h2>
+            <div class="ios-card">
+                <div class="ios-field">
+                    <label class="ios-label">Title</label>
                     <lightning-input
                         type="text"
-                        label="Title"
+                        class="ios-input"
                         value={title}
                         onchange={handleTitleChange}
+                        variant="label-hidden"
+                        placeholder="What's your idea?"
                         required>
                     </lightning-input>
                 </div>
-                <div class="slds-col slds-size_1-of-1 slds-m-top_small">
+                <div class="ios-field ios-field-textarea">
+                    <label class="ios-label">Description</label>
                     <lightning-textarea
-                        label="Description"
+                        class="ios-textarea"
                         value={description}
                         onchange={handleDescriptionChange}
+                        variant="label-hidden"
+                        placeholder="Describe your idea and its impact (at least 5 words)..."
                         required>
                     </lightning-textarea>
-                    <p class="helper-text">Please include at least five words describing the idea and its impact.</p>
+                    <span class="ios-hint">Include at least five words describing the idea and its impact.</span>
                 </div>
-                <div class="slds-col slds-size_1-of-1 slds-m-top_small">
+            </div>
+        </section>
+
+        <section class="ios-section">
+            <h2 class="ios-section-title">Classification</h2>
+            <div class="ios-card">
+                <div class="ios-field">
                     <lightning-dual-listbox
                         name="improvementType"
                         label="Improvement Type"
                         source-label="Available"
                         selected-label="Selected"
-                        field-level-help="Select one or more improvement types."
                         options={improvementTypeOptions}
                         value={improvementType}
                         onchange={handleImprovementTypeChange}>
                     </lightning-dual-listbox>
                 </div>
-                <div class="slds-col slds-size_1-of-1 slds-m-top_small">
+                <div class="ios-field">
                     <lightning-input
                         type="text"
                         label="Customer / Employee Impact"
                         value={customerImpact}
-                        onchange={handleCustomerImpactChange}>
+                        onchange={handleCustomerImpactChange}
+                        placeholder="How does this help?">
                     </lightning-input>
                 </div>
-                <div class="slds-col slds-size_1-of-1 slds-m-top_small">
-                    <lightning-input
-                        type="text"
-                        label="Tags"
-                        value={tags}
-                        onchange={handleTagsChange}
-                        message-toggle-active="Use semicolons to separate tags.">
-                    </lightning-input>
+                <div class="ios-field">
+                    <label class="ios-label">Tags</label>
+                    <div class="ios-tag-wrapper">
+                        <template for:each={tagsWithKey} for:item="tag">
+                            <span key={tag.id} class="ios-tag-pill">
+                                {tag.label}
+                                <button type="button" class="ios-tag-remove" data-index={tag.index} onclick={handleRemoveTag} aria-label="Remove tag">×</button>
+                            </span>
+                        </template>
+                        <input
+                            type="text"
+                            class="ios-tag-input"
+                            placeholder="Type a tag, press Enter"
+                            value={tagInput}
+                            oninput={handleTagInputChange}
+                            onkeydown={handleTagKeyDown}
+                        />
+                    </div>
+                    <span class="ios-hint">Press Enter or comma to add each tag.</span>
                 </div>
-                <div class="slds-col slds-size_1-of-2 slds-m-top_small">
+            </div>
+        </section>
+
+        <section class="ios-section">
+            <h2 class="ios-section-title">Visibility</h2>
+            <div class="ios-card">
+                <div class="ios-field">
                     <lightning-combobox
                         name="visibility"
-                        label="Visibility"
+                        label="Who can see this idea"
                         value={visibility}
                         options={visibilityOptions}
                         onchange={handleVisibilityChange}>
                     </lightning-combobox>
                 </div>
-                <div class="slds-col slds-size_1-of-2 slds-m-top_small slds-p-top_large">
-                    <lightning-input
-                        type="checkbox"
-                        label="This idea is confidential"
-                        checked={isConfidential}
-                        onchange={handleConfidentialChange}>
-                    </lightning-input>
-                </div>
             </div>
-            <div class="slds-m-top_large slds-text-align_right">
-                <lightning-button
-                    label="Cancel"
-                    variant="neutral"
-                    onclick={handleCancel}>
-                </lightning-button>
-                <lightning-button
-                    class="slds-m-left_small"
-                    label="Submit Idea"
-                    variant="brand"
-                    onclick={handleSubmit}
-                    disabled={submitting}>
-                </lightning-button>
-            </div>
-        </div>
-    </lightning-card>
-</template>
+        </section>
 
+        <div class="ios-actions">
+            <lightning-button
+                label="Cancel"
+                variant="neutral"
+                class="ios-btn ios-btn-secondary"
+                onclick={handleCancel}>
+            </lightning-button>
+            <lightning-button
+                label="Submit Idea"
+                variant="brand"
+                class="ios-btn ios-btn-primary"
+                onclick={handleSubmit}
+                disabled={submitting}>
+            </lightning-button>
+        </div>
+    </div>
+</template>

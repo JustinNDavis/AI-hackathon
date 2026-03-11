@@ -1,0 +1,45 @@
+<template>
+    <div class="comment-thread">
+        <div class="comment-item">
+            <div class="comment-avatar">{comment.initials}</div>
+            <div class="comment-content">
+                <div class="comment-header">
+                    <span class="comment-author">{comment.Created_By__r.Name}</span>
+                    <span class="comment-time">{comment.formattedTime}</span>
+                </div>
+                <p class="comment-text">{comment.Body__c}</p>
+                <template if:true={showReply}>
+                    <button type="button" class="comment-reply-btn" onclick={handleReplyClick}>Reply</button>
+                </template>
+            </div>
+        </div>
+        <template if:true={showReplyForm}>
+            <div class="comment-reply-form">
+                <lightning-textarea
+                    label="Write a reply"
+                    value={replyText}
+                    onchange={handleReplyChange}
+                    placeholder="Write your reply..."
+                    variant="label-hidden">
+                </lightning-textarea>
+                <div class="comment-reply-actions">
+                    <lightning-button label="Cancel" variant="neutral" onclick={handleReplyCancel}></lightning-button>
+                    <lightning-button label="Reply" variant="brand" onclick={handleReplySubmit} disabled={replying}></lightning-button>
+                </div>
+            </div>
+        </template>
+        <template if:true={hasReplies}>
+            <div class="comment-replies">
+                <template for:each={comment.children} for:item="child">
+                    <c-idea-comment-thread
+                        key={child.Id}
+                        comment={child}
+                        idea-id={ideaId}
+                        can-comment={canComment}
+                        onrefresh={handleChildRefresh}>
+                    </c-idea-comment-thread>
+                </template>
+            </div>
+        </template>
+    </div>
+</template>

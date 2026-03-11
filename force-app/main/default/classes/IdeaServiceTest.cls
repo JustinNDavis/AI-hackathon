@@ -38,7 +38,6 @@ private class IdeaServiceTest {
         Id ideaId = IdeaService.createIdea(
             'Improve onboarding emails',
             'This is a test idea to improve the onboarding email experience.',
-            false,
             'Open',
             'Process;Digital',
             'Reduces time to value for new customers',
@@ -54,7 +53,7 @@ private class IdeaServiceTest {
 
     @IsTest
     static void test_updateStatus_requiresNotes_forImplemented() {
-        Id ideaId = IdeaService.createIdea('Improve support response times', 'Another idea description with enough words for validation.', false, 'Open', null, null, null);
+        Id ideaId = IdeaService.createIdea('Improve support response times', 'Another idea description with enough words for validation.', 'Open', null, null, null);
 
         // Elevate to admin for status changes
         User adminUser = [SELECT Id FROM User WHERE Alias = 'idadmin' LIMIT 1];
@@ -79,7 +78,7 @@ private class IdeaServiceTest {
 
     @IsTest
     static void test_statusTransition_acknowledged_only_from_under_review() {
-        Id ideaId = IdeaService.createIdea('Improve invoice layout', 'This is a third test idea description that should pass word count.', false, 'Open', null, null, null);
+        Id ideaId = IdeaService.createIdea('Improve invoice layout', 'This is a third test idea description that should pass word count.', 'Open', null, null, null);
 
         User adminUser = [SELECT Id FROM User WHERE Alias = 'idadmin' LIMIT 1];
         System.runAs(adminUser) {
@@ -99,7 +98,7 @@ private class IdeaServiceTest {
 
     @IsTest
     static void test_updateVisibility_and_comments() {
-        Id ideaId = IdeaService.createIdea('Improve search experience', 'This idea is to improve search so that users can find things faster.', false, 'Private', null, null, null);
+        Id ideaId = IdeaService.createIdea('Improve search experience', 'This idea is to improve search so that users can find things faster.', 'Private', null, null, null);
 
         Test.startTest();
         // Creator changes visibility
@@ -107,7 +106,7 @@ private class IdeaServiceTest {
         System.assertEquals('Open', visible.Visibility__c);
 
         // Add a comment
-        Id commentId = IdeaService.addComment(ideaId, 'Great idea, we should prioritize this.');
+        Id commentId = IdeaService.addComment(ideaId, 'Great idea, we should prioritize this.', null);
         System.assertNotEquals(null, commentId);
 
         List<Idea_Comment__c> comments = IdeaService.listComments(ideaId);
@@ -115,6 +114,23 @@ private class IdeaServiceTest {
 
         System.assertEquals(1, comments.size(), 'Expected one comment for this idea.');
         System.assertEquals('Great idea, we should prioritize this.', comments[0].Body__c);
+
+        // Add a reply (nested comment)
+        Id replyId = IdeaService.addComment(ideaId, 'I agree, let us prioritize.', commentId);
+        System.assertNotEquals(null, replyId);
+
+        List<Idea_Comment__c> commentsWithReply = IdeaService.listComments(ideaId);
+        System.assertEquals(2, commentsWithReply.size(), 'Expected two comments (parent + reply).');
+        Idea_Comment__c reply = null;
+        for (Idea_Comment__c c : commentsWithReply) {
+            if (c.Parent_Comment__c != null) {
+                reply = c;
+                break;
+            }
+        }
+        System.assertNotEquals(null, reply, 'Expected one reply with Parent_Comment__c set.');
+        System.assertEquals(commentId, reply.Parent_Comment__c);
+        System.assertEquals('I agree, let us prioritize.', reply.Body__c);
     }
 }
 
