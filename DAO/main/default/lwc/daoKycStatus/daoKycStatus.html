@@ -1,0 +1,115 @@
+<template>
+    <div class="aub-step aub-step--pad">
+        <h2 class="aub-step__title">{stepTitle}</h2>
+        <div class="kyc-mock-bar">
+            <p class="kyc-mock-bar__title">Demo — mock outcome</p>
+            <lightning-button
+                variant="neutral"
+                label="Successful verification"
+                title="Forces a clean approval after the loader"
+                onclick={handleMockApproved}
+                disabled={isLoading}
+            ></lightning-button>
+            <lightning-button
+                variant="neutral"
+                label="Review (several flags)"
+                title="Forces manual review with multiple policy flags"
+                onclick={handleMockReview}
+                disabled={isLoading}
+            ></lightning-button>
+        </div>
+
+        <template lwc:if={isLoading}>
+            <div class="aub-loader-stage" role="status" aria-live="polite">
+                <div class="aub-loader" aria-hidden="true">
+                    <div class="aub-loader__ring"></div>
+                    <div class="aub-loader__ring aub-loader__ring--lag"></div>
+                    <div class="aub-loader__pulse"></div>
+                </div>
+                <p class="aub-loader__caption">{loaderCaption}</p>
+                <p class="aub-loader__sub">{loaderSub}</p>
+            </div>
+        </template>
+
+        <template lwc:if={isApproved}>
+            <div class="kyc-panel kyc-panel_approved">
+                <div class="slds-grid slds-grid_vertical-align-center">
+                    <lightning-icon
+                        icon-name="utility:success"
+                        alternative-text="Approved"
+                        size="small"
+                        class="kyc-panel__icon slds-m-right_small"
+                    ></lightning-icon>
+                    <div>
+                        <p class="slds-text-heading_small slds-m-bottom_xx-small">Verified — approved</p>
+                        <p class="slds-text-body_regular">
+                            Confidence score: <strong>{confidenceDisplay}</strong>
+                        </p>
+                        <p class="slds-text-body_small slds-text-color_weak slds-m-top_x-small">
+                            Advancing to the next step automatically in a few seconds (or use the wizard Next button).
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template lwc:if={isReview}>
+            <div class="kyc-panel kyc-panel_review">
+                <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                    <lightning-icon
+                        icon-name="utility:warning"
+                        alternative-text="Review required"
+                        size="small"
+                        class="kyc-panel__icon-warn slds-m-right_small"
+                    ></lightning-icon>
+                    <div>
+                        <p class="slds-text-heading_small slds-m-bottom_xx-small">Manual review required</p>
+                        <p class="slds-text-body_small slds-text-color_weak">
+                            {reviewSubtext}
+                        </p>
+                    </div>
+                </div>
+
+                <template lwc:if={showFlagChips}>
+                    <p class="slds-text-title_caps slds-m-bottom_x-small">Outcome reasons</p>
+                    <div class="slds-m-bottom_medium kyc-chips" role="list">
+                        <template for:each={flagChips} for:item="chip">
+                            <span
+                                key={chip.id}
+                                class="kyc-chip slds-m-right_xx-small slds-m-bottom_xx-small"
+                                role="listitem"
+                                title={chip.raw}
+                            >
+                                <span class="kyc-chip__label">{chip.label}</span>
+                            </span>
+                        </template>
+                    </div>
+                </template>
+
+                <lightning-button
+                    variant="brand"
+                    label="Continue to banker review"
+                    title="Proceed in the wizard while Alloy completes review in the background"
+                    onclick={handleContinueManualReview}
+                ></lightning-button>
+            </div>
+        </template>
+
+        <template lwc:if={isDeclined}>
+            <div class="kyc-panel kyc-panel_error">
+                <p class="slds-text-heading_small slds-m-bottom_x-small">Verification not approved</p>
+                <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">{declinePanelSubtext}</p>
+                <p class="slds-text-body_regular slds-m-bottom_small">{declineMessage}</p>
+                <lightning-button variant="neutral" label="Re-run verification (mock)" onclick={handleRetry}></lightning-button>
+            </div>
+        </template>
+
+        <template lwc:if={isError}>
+            <div class="kyc-panel kyc-panel_error">
+                <p class="slds-text-heading_small slds-m-bottom_x-small">Journey error</p>
+                <p class="slds-text-body_regular slds-m-bottom_small">{errorMessage}</p>
+                <lightning-button variant="neutral" label="Try again" onclick={handleRetry}></lightning-button>
+            </div>
+        </template>
+    </div>
+</template>

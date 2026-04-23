@@ -1,0 +1,18 @@
+.field-list dt {
+    font-size: 0.65rem;
+}
+
+.dao-wizard-modal {
+    width: min(96vw, 72rem);
+    max-width: 100%;
+    /* SLDS modal container overflow clips combobox dropdowns */
+    overflow: visible;
+}
+
+.dao-wizard-modal__body {
+    max-height: min(88vh, 900px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    /* Extra scroll room so relationship picklists near the bottom aren’t clipped */
+    padding-bottom: 10rem;
+}

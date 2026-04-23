@@ -1,0 +1,144 @@
+<template>
+    <div class="aub-step aub-step--pad">
+        <h2 class="aub-step__title">Funding</h2>
+        <p class="aub-step__lede aub-step__lede--spaced">{fundingLede}</p>
+
+        <fieldset class="slds-form-element">
+            <legend class="slds-assistive-text">Funding method</legend>
+
+            <div
+                class={plaidCardClass}
+                data-select="plaid"
+                role="button"
+                tabindex="0"
+                onclick={selectPlaid}
+                onkeydown={handleCardKeydown}
+            >
+                <div class="fund-card__row slds-grid slds-gutters_small slds-grid_vertical-align-start">
+                    <div class="slds-col slds-grow-none slds-shrink-none">
+                        <lightning-input
+                            type="radio"
+                            name="daoFundingMethod"
+                            label="Link External Account (Plaid)"
+                            variant="label-hidden"
+                            checked={isPlaid}
+                            onchange={handlePlaidRadio}
+                        ></lightning-input>
+                    </div>
+                    <div class="slds-col">
+                        <h3 class="slds-text-heading_small slds-m-bottom_xx-small">Link External Account (Plaid)</h3>
+                        <p class="slds-text-body_small slds-text-color_weak">{plaidHelperText}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class={swivelCardClass}
+                data-select="swivel"
+                role="button"
+                tabindex="0"
+                onclick={selectSwivel}
+                onkeydown={handleCardKeydown}
+            >
+                <div class="fund-card__row slds-grid slds-gutters_small slds-grid_vertical-align-start">
+                    <div class="slds-col slds-grow-none slds-shrink-none">
+                        <lightning-input
+                            type="radio"
+                            name="daoFundingMethod"
+                            label="Wire / Other (Swivel)"
+                            variant="label-hidden"
+                            checked={isSwivel}
+                            onchange={handleSwivelRadio}
+                        ></lightning-input>
+                    </div>
+                    <div class="slds-col">
+                        <h3 class="slds-text-heading_small slds-m-bottom_xx-small">Wire / Other (Swivel)</h3>
+                        <p class="slds-text-body_small slds-text-color_weak">
+                            Fund by wire or other instructions coordinated through Swivel. Enter a reference or note for your wire.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class={fundLaterCardClass}
+                data-select="fund_later"
+                role="button"
+                tabindex="0"
+                onclick={selectFundLater}
+                onkeydown={handleCardKeydown}
+            >
+                <div class="fund-card__row slds-grid slds-gutters_small slds-grid_vertical-align-start">
+                    <div class="slds-col slds-grow-none slds-shrink-none">
+                        <lightning-input
+                            type="radio"
+                            name="daoFundingMethod"
+                            label="Fund later"
+                            variant="label-hidden"
+                            checked={isFundLater}
+                            onchange={handleFundLaterRadio}
+                        ></lightning-input>
+                    </div>
+                    <div class="slds-col">
+                        <h3 class="slds-text-heading_small slds-m-bottom_xx-small">Fund later</h3>
+                        <p class="slds-text-body_small slds-text-color_weak">
+                            Open the account now and add funds at another time (branch, transfer, or follow-up).
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <template lwc:if={isPlaid}>
+            <div class="aub-panel-inset slds-m-top_medium slds-p-around_small">
+                <p class="aub-panel-inset__label slds-m-bottom_small">Plaid</p>
+                <lightning-button
+                    variant="brand"
+                    label="Launch Plaid Link (mock)"
+                    onclick={handleMockPlaidLink}
+                    disabled={plaidLoading}
+                    class="slds-m-bottom_small"
+                ></lightning-button>
+                <template lwc:if={plaidLoading}>
+                    <div class="aub-loader-stage aub-loader-stage--inline" role="status" aria-live="polite">
+                        <div class="aub-loader aub-loader--sm" aria-hidden="true">
+                            <div class="aub-loader__ring"></div>
+                            <div class="aub-loader__ring aub-loader__ring--lag"></div>
+                            <div class="aub-loader__pulse"></div>
+                        </div>
+                        <p class="aub-loader__caption aub-loader__caption--inline">Opening Plaid Link (mock)…</p>
+                    </div>
+                </template>
+                <template lwc:if={plaidError}>
+                    <p class="slds-text-color_error slds-text-body_small slds-m-top_x-small">{plaidError}</p>
+                </template>
+                <template lwc:if={showPlaidDetails}>
+                    <div class="slds-m-top_small slds-text-body_small">
+                        <p><strong>Institution:</strong> {plaidResult.institution}</p>
+                        <p><strong>Account</strong> ending in {plaidResult.accountLast4}</p>
+                        <p class="slds-m-top_xx-small">
+                            <strong>Available balance (mock):</strong>
+                            <lightning-formatted-number
+                                value={plaidResult.balance}
+                                format-style="currency"
+                                currency-code="USD"
+                                maximum-fraction-digits="0"
+                            ></lightning-formatted-number>
+                        </p>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <template lwc:if={isSwivel}>
+            <div class="slds-m-top_medium">
+                <lightning-textarea
+                    label="Wire instructions reference"
+                    placeholder="e.g. confirmation #, sender bank, or internal ticket ID"
+                    value={wireReference}
+                    onchange={handleWireChange}
+                ></lightning-textarea>
+            </div>
+        </template>
+    </div>
+</template>

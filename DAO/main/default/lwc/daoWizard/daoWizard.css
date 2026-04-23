@@ -1,0 +1,277 @@
+:host {
+    display: block;
+    color-scheme: light;
+    --aub-blue: #1a5296;
+    --aub-blue-bright: #2b7cc6;
+    --aub-green: #2db86d;
+    --aub-green-bright: #3dd68c;
+    --aub-teal: #1bb88a;
+    --aub-sea: #3d9fd9;
+    --aub-glow: rgba(45, 184, 109, 0.22);
+    --aub-bg-top: #f9fdfb;
+    --aub-bg-mid: #f2f8fc;
+    --aub-surface: #ffffff;
+    --aub-surface-elevated: #f4fbf7;
+    --aub-border: rgba(26, 82, 150, 0.14);
+    --aub-border-strong: rgba(26, 82, 150, 0.24);
+    --aub-text: #153e5c;
+    --aub-text-soft: #3d5a73;
+    --aub-text-faint: #6b8299;
+    --aub-radius: 20px;
+    --aub-radius-sm: 12px;
+    /* Sans display stack — aligns with AUB public site / wordmark (see atlanticunionbank.com). */
+    --aub-font-display: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --aub-font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: var(--aub-font-ui);
+    color: var(--aub-text);
+    -webkit-font-smoothing: antialiased;
+}
+
+.aub-shell {
+    position: relative;
+    border-radius: var(--aub-radius);
+    /* visible so lightning-combobox menus are not clipped (overflow:hidden cuts picklists) */
+    overflow: visible;
+    background: linear-gradient(165deg, var(--aub-bg-top) 0%, var(--aub-bg-mid) 48%, #ecf8f2 100%);
+    border: 1px solid var(--aub-border-strong);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.85) inset,
+        0 20px 56px rgba(21, 62, 92, 0.1),
+        0 0 80px var(--aub-glow);
+}
+
+.aub-shell__glow {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 58%;
+    border-radius: var(--aub-radius) var(--aub-radius) 0 0;
+    background: radial-gradient(ellipse 75% 55% at 50% 0%, rgba(61, 223, 140, 0.18), transparent 72%);
+    pointer-events: none;
+}
+
+.aub-shell__noise {
+    position: absolute;
+    inset: 0;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    mix-blend-mode: multiply;
+}
+
+.aub-header {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.75rem 2rem 1.25rem;
+    border-bottom: 1px solid var(--aub-border);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+.aub-brand {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.85rem 1.25rem;
+    min-width: 0;
+}
+
+.aub-brand__logo {
+    display: block;
+    height: 2.75rem;
+    width: auto;
+    max-width: min(100%, 15.5rem);
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.aub-brand__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.aub-brand__product {
+    font-family: var(--aub-font-display);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--aub-text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+}
+
+.aub-header__meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.aub-pill {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    background: var(--aub-surface-elevated);
+    border: 1px solid var(--aub-border);
+    color: var(--aub-text-soft);
+}
+
+.aub-pill strong {
+    color: var(--aub-green);
+    font-weight: 700;
+}
+
+.aub-app-id {
+    font-size: 0.7rem;
+    color: var(--aub-text-faint);
+    font-variant-numeric: tabular-nums;
+}
+
+.aub-progress-block {
+    position: relative;
+    padding: 1.25rem 2rem 1.5rem;
+}
+
+.aub-progress__labels {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.65rem;
+}
+
+.aub-progress__title {
+    font-family: var(--aub-font-display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--aub-text);
+}
+
+.aub-progress__pct {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--aub-green);
+    font-variant-numeric: tabular-nums;
+}
+
+.aub-progress__track {
+    position: relative;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(26, 82, 150, 0.1);
+    border: 1px solid var(--aub-border);
+    overflow: hidden;
+}
+
+.aub-progress__fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--aub-sea), var(--aub-teal), var(--aub-green-bright));
+    box-shadow: 0 0 16px rgba(45, 184, 109, 0.35);
+    transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    min-width: 0;
+}
+
+.aub-progress__sheen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+    background-size: 200% 100%;
+    animation: aub-sheen 2.2s ease-in-out infinite;
+    opacity: 0.65;
+    mix-blend-mode: soft-light;
+    border-radius: 999px;
+}
+
+@keyframes aub-sheen {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.aub-main {
+    position: relative;
+    padding: 0 2rem 2rem;
+    min-height: 12rem;
+}
+
+.aub-main__inner {
+    border-radius: var(--aub-radius-sm);
+    background: var(--aub-surface);
+    border: 1px solid var(--aub-border);
+    box-shadow: 0 12px 40px rgba(21, 62, 92, 0.08);
+    overflow: visible;
+}
+
+.aub-footer {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 2rem 1.75rem;
+    border-top: 1px solid var(--aub-border);
+    background: linear-gradient(0deg, rgba(244, 251, 247, 0.85) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+.aub-btn {
+    font-family: var(--aub-font-ui);
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.85rem 1.75rem;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.aub-btn:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.aub-btn:not(:disabled):active {
+    transform: scale(0.98);
+}
+
+.aub-btn--ghost {
+    background: transparent;
+    color: var(--aub-blue);
+    border: 1px solid var(--aub-border-strong);
+}
+
+.aub-btn--ghost:not(:disabled):hover {
+    background: var(--aub-surface-elevated);
+    color: var(--aub-blue-bright);
+}
+
+.aub-btn--primary {
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--aub-green) 0%, var(--aub-green-bright) 100%);
+    box-shadow:
+        0 4px 18px rgba(45, 184, 109, 0.35),
+        0 0 0 1px rgba(255, 255, 255, 0.25) inset;
+}
+
+.aub-btn--primary:not(:disabled):hover {
+    box-shadow:
+        0 8px 26px rgba(45, 184, 109, 0.42),
+        0 0 0 1px rgba(255, 255, 255, 0.35) inset;
+}

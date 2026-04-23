@@ -24,16 +24,21 @@
                 </div>
             </div>
 
-            <!-- Top 5 cards -->
             <template if:true={hasTopIdeas}>
                 <section class="top-ideas-section slds-m-bottom_large">
-                    <h3 class="top-ideas-title">Top Ideas</h3>
+                    <h3 class="top-ideas-title">Most liked</h3>
+                    <p class="top-ideas-hint">Likes are a quick way to show appreciation — they are not used to prioritize work.</p>
                     <div class="top-ideas-grid">
                         <template for:each={topIdeas} for:item="idea">
                             <div key={idea.Id} class="idea-card" onclick={handleCardClick} data-id={idea.Id}>
-                                <div class="idea-card-votes">
-                                    <span class="idea-card-vote-count">{idea.Vote_Count__c}</span>
-                                    <span class="idea-card-vote-label">votes</span>
+                                <div class="idea-card-likes" aria-label={idea.likesAriaLabel}>
+                                    <lightning-icon
+                                        icon-name="utility:like"
+                                        size="small"
+                                        alternative-text=""
+                                        class="idea-card-like-icon"
+                                    ></lightning-icon>
+                                    <span class="idea-card-like-count" aria-hidden="true">{idea.Vote_Count__c}</span>
                                 </div>
                                 <div class="idea-card-body">
                                     <h4 class="idea-card-title">{idea.Title__c}</h4>
@@ -58,13 +63,18 @@
             <template if:false={error}>
                 <template if:true={hasIdeas}>
                     <section class="idea-list-section">
-                        <h3 class="idea-list-title">All Ideas</h3>
+                        <h3 class="idea-list-title">All ideas</h3>
                         <div class="idea-list">
                         <template for:each={ideas} for:item="idea">
                             <article key={idea.Id} class="idea-row">
-                                <div class="idea-row-votes">
-                                    <span class="idea-row-vote-num">{idea.Vote_Count__c}</span>
-                                    <span class="idea-row-vote-txt">votes</span>
+                                <div class="idea-row-likes" aria-label={idea.likesAriaLabel}>
+                                    <lightning-icon
+                                        icon-name="utility:like"
+                                        size="small"
+                                        alternative-text=""
+                                        class="idea-row-like-icon"
+                                    ></lightning-icon>
+                                    <span class="idea-row-like-count" aria-hidden="true">{idea.Vote_Count__c}</span>
                                 </div>
                                 <div class="idea-row-main" data-id={idea.Id} onclick={handleIdeaClick}>
                                     <div class="idea-row-header">
@@ -81,24 +91,15 @@
                                     <p class="idea-row-desc" if:true={idea.descriptionSnippet}>{idea.descriptionSnippet}</p>
                                 </div>
                                 <div class="idea-row-actions">
-                                    <template if:true={idea.hasVoted}>
-                                        <lightning-button
-                                            label="Unvote"
-                                            variant="neutral"
-                                            class="idea-action-btn"
-                                            data-id={idea.Id}
-                                            onclick={handleUnvoteClick}>
-                                        </lightning-button>
-                                    </template>
-                                    <template if:false={idea.hasVoted}>
-                                        <lightning-button
-                                            label="Vote"
-                                            variant="brand"
-                                            class="idea-action-btn"
-                                            data-id={idea.Id}
-                                            onclick={handleVoteClick}>
-                                        </lightning-button>
-                                    </template>
+                                    <lightning-button-icon
+                                        icon-name="utility:like"
+                                        variant={idea.likeIconVariant}
+                                        alternative-text={idea.likeButtonAlt}
+                                        title={idea.likeButtonAlt}
+                                        class="idea-like-btn"
+                                        data-id={idea.Id}
+                                        onclick={handleLikeToggle}>
+                                    </lightning-button-icon>
                                     <lightning-button
                                         label="Open"
                                         variant="neutral"

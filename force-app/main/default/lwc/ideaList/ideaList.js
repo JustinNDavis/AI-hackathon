@@ -21,6 +21,12 @@ function firstTwoLines(str, maxChars = 120) {
     return two.length <= maxChars ? two : two.substring(0, maxChars) + '...';
 }
 
+function likesAriaLabel(count) {
+    const n = count == null || count === '' ? 0 : Number(count);
+    const safe = Number.isNaN(n) ? 0 : n;
+    return safe === 1 ? '1 like' : `${safe} likes`;
+}
+
 export default class IdeaList extends NavigationMixin(LightningElement) {
     @track scope = 'My';
     @track ideas = [];
@@ -112,13 +118,17 @@ export default class IdeaList extends NavigationMixin(LightningElement) {
 
     enrichIdea(row) {
         const voteCount = row.Vote_Count__c == null ? 0 : row.Vote_Count__c;
+        const hasVoted = this.votedIdeaIds && this.votedIdeaIds.includes(row.Id);
         return {
             ...row,
             ownerName: row.Owner__r ? row.Owner__r.Name : '—',
             Vote_Count__c: voteCount,
             formattedDate: formatDate(row.LastModifiedDate),
             descriptionSnippet: firstTwoLines(row.Description__c),
-            hasVoted: this.votedIdeaIds && this.votedIdeaIds.includes(row.Id)
+            hasVoted,
+            likesAriaLabel: likesAriaLabel(voteCount),
+            likeIconVariant: hasVoted ? 'border-filled' : 'border',
+            likeButtonAlt: hasVoted ? 'Remove your like' : 'Like this idea'
         };
     }
 
@@ -135,7 +145,15 @@ export default class IdeaList extends NavigationMixin(LightningElement) {
         getIdeasUserHasVotedFor({ ideaIds: ids })
             .then((voted) => {
                 this.votedIdeaIds = voted || [];
-                this.ideas = this.ideas.map((i) => ({ ...i, hasVoted: this.votedIdeaIds.includes(i.Id) }));
+                this.ideas = this.ideas.map((i) => {
+                    const hasVoted = this.votedIdeaIds.includes(i.Id);
+                    return {
+                        ...i,
+                        hasVoted,
+                        likeIconVariant: hasVoted ? 'border-filled' : 'border',
+                        likeButtonAlt: hasVoted ? 'Remove your like' : 'Like this idea'
+                    };
+                });
             })
             .catch(() => {
                 this.votedIdeaIds = [];
@@ -145,11 +163,16 @@ export default class IdeaList extends NavigationMixin(LightningElement) {
     loadTopIdeas() {
         getTopIdeas({ limitCount: 5 })
             .then((data) => {
-                this.topIdeas = (data || []).map((row) => ({
-                    ...row,
-                    descriptionSnippet: this.truncate(row.Description__c, 100),
-                    ownerName: row.Owner__r ? row.Owner__r.Name : '—'
-                }));
+                this.topIdeas = (data || []).map((row) => {
+                    const voteCount = row.Vote_Count__c == null ? 0 : row.Vote_Count__c;
+                    return {
+                        ...row,
+                        Vote_Count__c: voteCount,
+                        descriptionSnippet: this.truncate(row.Description__c, 100),
+                        ownerName: row.Owner__r ? row.Owner__r.Name : '—',
+                        likesAriaLabel: likesAriaLabel(voteCount)
+                    };
+                });
             })
             .catch(() => {
                 this.topIdeas = [];
@@ -184,16 +207,18 @@ export default class IdeaList extends NavigationMixin(LightningElement) {
         if (id) this.navigateToRecord(id);
     }
 
-    handleVoteClick(event) {
+    handleLikeToggle(event) {
         event.stopPropagation();
         const id = event.currentTarget.dataset.id;
-        if (id) this.doVote(id);
-    }
-
-    handleUnvoteClick(event) {
-        event.stopPropagation();
-        const id = event.currentTarget.dataset.id;
-        if (id) this.doUnvote(id);
+        if (!id) {
+            return;
+        }
+        const row = this.ideas.find((i) => i.Id === id);
+        if (row && row.hasVoted) {
+            this.doUnvote(id);
+        } else {
+            this.doVote(id);
+        }
     }
 
     handleOpenClick(event) {
@@ -205,24 +230,48 @@ export default class IdeaList extends NavigationMixin(LightningElement) {
     doVote(ideaId) {
         voteIdea({ ideaId })
             .then(() => {
-                this.dispatchEvent(new ShowToastEvent({ title: 'Voted', message: 'Your vote was recorded.', variant: 'success' }));
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Thanks!',
+                        message: 'Your like was saved. Likes are just appreciation — not a priority vote.',
+                        variant: 'success'
+                    })
+                );
                 this.votedIdeaIds = [...this.votedIdeaIds, ideaId];
                 this.refreshIdeasAndTop();
             })
             .catch((e) => {
-                this.dispatchEvent(new ShowToastEvent({ title: 'Error', message: e.body?.message || e.message || 'Could not vote.', variant: 'error' }));
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Could not like',
+                        message: e.body?.message || e.message || 'Something went wrong.',
+                        variant: 'error'
+                    })
+                );
             });
     }
 
     doUnvote(ideaId) {
         unvoteIdea({ ideaId })
             .then(() => {
-                this.dispatchEvent(new ShowToastEvent({ title: 'Unvoted', message: 'Your vote was removed.', variant: 'success' }));
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Like removed',
+                        message: 'You removed your like from this idea.',
+                        variant: 'success'
+                    })
+                );
                 this.votedIdeaIds = this.votedIdeaIds.filter((id) => id !== ideaId);
                 this.refreshIdeasAndTop();
             })
             .catch((e) => {
-                this.dispatchEvent(new ShowToastEvent({ title: 'Error', message: e.body?.message || e.message || 'Could not unvote.', variant: 'error' }));
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Could not update',
+                        message: e.body?.message || e.message || 'Something went wrong.',
+                        variant: 'error'
+                    })
+                );
             });
     }
 

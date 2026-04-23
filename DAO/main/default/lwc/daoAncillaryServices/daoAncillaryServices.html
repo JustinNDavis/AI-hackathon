@@ -1,0 +1,31 @@
+<template>
+    <div class="aub-step aub-step--pad">
+        <h2 class="aub-step__title">Ancillary services</h2>
+        <p class="aub-step__lede aub-step__lede--spaced">
+            Choose optional products and enrollments for this application. You can change these before account opening is finalized.
+        </p>
+
+        <ul class="anc-list">
+            <template for:each={serviceRows} for:item="row">
+                <li key={row.key} class="slds-item anc-row">
+                    <div class="slds-grid slds-grid_align-spread slds-gutters">
+                        <div class="slds-col slds-size_4-of-5">
+                            <h3 class="slds-text-heading_small slds-m-bottom_xx-small">{row.label}</h3>
+                            <p class="slds-text-body_small slds-text-color_weak anc-desc">{row.description}</p>
+                        </div>
+                        <div class="slds-col slds-size_1-of-5 slds-text-align_right anc-toggle-wrap">
+                            <lightning-input
+                                type="toggle"
+                                label={row.label}
+                                variant="label-hidden"
+                                data-key={row.key}
+                                checked={row.checked}
+                                onchange={handleToggle}
+                            ></lightning-input>
+                        </div>
+                    </div>
+                </li>
+            </template>
+        </ul>
+    </div>
+</template>

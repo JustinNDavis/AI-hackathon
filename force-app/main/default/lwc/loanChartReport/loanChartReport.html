@@ -1,0 +1,67 @@
+<template>
+    <div class="shell">
+        <header class="head">
+            <div class="head-text">
+                <h1 class="title">Loan portfolio</h1>
+                <p class="sub">Total principal by status — refine with search, status, and term filters.</p>
+            </div>
+            <div class="metrics" lwc:if={hasData}>
+                <span class="metric"><em>{filteredCount}</em> loans</span>
+                <span class="metric"><em>{formattedFilteredPrincipal}</em> principal</span>
+            </div>
+        </header>
+
+        <div class="toolbar">
+            <lightning-input
+                type="search"
+                label="Search"
+                variant="label-hidden"
+                placeholder="Search loan or account name..."
+                value={searchText}
+                onchange={handleSearchChange}
+                class="tool-search"
+            ></lightning-input>
+            <lightning-combobox
+                name="status"
+                label="Status"
+                value={statusFilter}
+                placeholder="All statuses"
+                options={statusOptions}
+                onchange={handleStatusChange}
+                class="tool-dd"
+            ></lightning-combobox>
+            <lightning-combobox
+                name="term"
+                label="Term"
+                value={termFilter}
+                placeholder="Any term"
+                options={termOptions}
+                onchange={handleTermChange}
+                class="tool-dd"
+            ></lightning-combobox>
+            <lightning-button variant="neutral" label="Clear filters" onclick={handleClearFilters} class="tool-btn"></lightning-button>
+        </div>
+
+        <template lwc:if={error}>
+            <div class="panel panel_error">{errorMessage}</div>
+        </template>
+
+        <template lwc:if={isLoading}>
+            <div class="panel panel_loading">
+                <lightning-spinner alternative-text="Loading loans" size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <template lwc:if={showNoLoansInOrg}>
+            <div class="panel panel_empty">No loan records found. Create loans to see this report.</div>
+        </template>
+
+        <template lwc:if={showEmptyState}>
+            <div class="panel panel_empty">No loans match the current filters.</div>
+        </template>
+
+        <div class="chart-wrap" lwc:if={showChart}>
+            <canvas class="loan-chart-canvas"></canvas>
+        </div>
+    </div>
+</template>

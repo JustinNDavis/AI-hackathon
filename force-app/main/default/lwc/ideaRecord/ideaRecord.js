@@ -18,6 +18,12 @@ import listComments from '@salesforce/apex/IdeaService.listComments';
 import addComment from '@salesforce/apex/IdeaService.addComment';
 import updateStatus from '@salesforce/apex/IdeaService.updateStatus';
 
+const IMPROVEMENT_TYPE_LABELS = {
+    Customer_Experience: 'Customer experience',
+    Process_Improvement: 'Process improvement',
+    Product_Idea: 'Product idea'
+};
+
 const FIELDS = [
     STATUS_FIELD,
     TITLE_FIELD,
@@ -77,6 +83,17 @@ export default class IdeaRecord extends LightningElement {
     connectedCallback() {
         this.refreshAdminFlag();
         this.refreshComments();
+    }
+
+    get improvementTypeDisplay() {
+        const v = this.idea?.Improvement_Type__c;
+        if (!v) {
+            return '';
+        }
+        if (IMPROVEMENT_TYPE_LABELS[v]) {
+            return IMPROVEMENT_TYPE_LABELS[v];
+        }
+        return String(v).replace(/_/g, ' ');
     }
 
     get ownerName() {

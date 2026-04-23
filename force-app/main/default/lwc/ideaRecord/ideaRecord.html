@@ -20,7 +20,7 @@
                             <h3 class="section-title">Idea</h3>
                             <p class="field"><span class="label">Title:</span> {idea.Title__c}</p>
                             <p class="field"><span class="label">Visibility:</span> {idea.Visibility__c}</p>
-                            <p class="field"><span class="label">Improvement Type:</span> {idea.Improvement_Type__c}</p>
+                            <p class="field"><span class="label">Improvement Type:</span> {improvementTypeDisplay}</p>
                             <p class="field"><span class="label">Impact:</span> {idea.Customer_Impact__c}</p>
                             <p class="field"><span class="label">Tags:</span></p>
                             <template if:true={hasTags}>
@@ -84,6 +84,7 @@
                                 <div class="slds-m-top_small slds-text-align_right">
                                     <lightning-button
                                         variant="brand"
+                                        class="aub-brand-btn"
                                         label="Add Comment"
                                         onclick={handleAddComment}
                                         disabled={addingComment}>
@@ -99,6 +100,7 @@
                         <h3 class="section-title">Admin Panel</h3>
                         <lightning-button
                             variant="brand-outline"
+                            class="aub-outline-btn"
                             label="Close / Update Status"
                             onclick={openCloseModal}>
                         </lightning-button>
@@ -138,7 +140,7 @@
                                     onclick={closeCloseModal}>
                                 </lightning-button>
                                 <lightning-button
-                                    class="slds-m-left_small"
+                                    class="slds-m-left_small aub-brand-btn"
                                     label="Save"
                                     variant="brand"
                                     onclick={handleCloseSave}

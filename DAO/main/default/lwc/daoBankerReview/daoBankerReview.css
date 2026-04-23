@@ -1,0 +1,120 @@
+:host {
+    color-scheme: light;
+    --aub-teal: #1bb88a;
+    --aub-surface: #ffffff;
+    --aub-surface-subtle: #f4fbf7;
+    --aub-border: rgba(26, 82, 150, 0.14);
+    --aub-text: #153e5c;
+    --aub-muted: #5a7288;
+    --aub-font-display: Georgia, 'Times New Roman', 'Liberation Serif', serif;
+    --aub-font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--aub-text);
+    font-family: var(--aub-font-ui);
+    -webkit-font-smoothing: antialiased;
+}
+
+.aub-step--pad {
+    padding: 1.75rem 2rem 2rem;
+}
+
+.aub-step__title {
+    font-family: var(--aub-font-display);
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin: 0 0 0.35rem;
+    letter-spacing: 0.02em;
+    color: #1a5296;
+}
+
+.aub-step__lede {
+    margin: 0 0 1.25rem;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--aub-muted);
+    max-width: 44rem;
+}
+
+.aub-warnings {
+    border-radius: 14px;
+    padding: 1rem 1.15rem;
+    border: 1px solid rgba(180, 130, 40, 0.35);
+    border-left-width: 4px;
+    background: linear-gradient(90deg, rgba(255, 243, 205, 0.65), rgba(255, 250, 235, 0.9));
+    box-shadow: 0 8px 24px rgba(21, 62, 92, 0.06);
+}
+
+.aub-warnings .slds-text-heading_small {
+    color: #6b4e0a;
+    font-weight: 600;
+}
+
+.banker-warnings__icon {
+    --slds-c-icon-color-foreground-default: #b8860b;
+}
+
+.banker-warnings__list {
+    margin-bottom: 0;
+    color: #3d3518;
+}
+
+.aub-review-card {
+    border-radius: 16px;
+    padding: 1rem 1.15rem 1.15rem;
+    border: 1px solid var(--aub-border);
+    background: linear-gradient(165deg, var(--aub-surface), var(--aub-surface-subtle));
+    box-shadow: 0 8px 28px rgba(21, 62, 92, 0.06);
+}
+
+.aub-review-card__title {
+    margin: 0;
+    font-family: var(--aub-font-ui);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--aub-teal);
+}
+
+.review-section__head {
+    margin-bottom: 0;
+}
+
+.review-section .slds-text-body_small.slds-text-color_weak {
+    color: var(--aub-muted) !important;
+}
+
+.review-section ul {
+    color: var(--aub-text);
+}
+
+.aub-confirm-panel {
+    border-radius: 14px;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(45, 184, 109, 0.35);
+    background: linear-gradient(135deg, rgba(45, 184, 109, 0.08), rgba(61, 159, 217, 0.05));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.review-dl {
+    margin: 0;
+}
+
+.review-dl__row {
+    display: grid;
+    grid-template-columns: 11rem 1fr;
+    gap: 0.5rem 1rem;
+    font-size: 0.8125rem;
+    margin-bottom: 0.35rem;
+}
+
+.review-dl__dt {
+    margin: 0;
+    color: var(--aub-muted);
+    font-weight: 600;
+}
+
+.review-dl__dd {
+    margin: 0;
+    word-break: break-word;
+    color: var(--aub-text);
+}

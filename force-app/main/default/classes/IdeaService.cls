@@ -11,6 +11,9 @@ public with sharing class IdeaService {
         if (countWords(description) < 5) {
             throw new AuraHandledException('Description must contain at least five words.');
         }
+        if (String.isBlank(improvementType)) {
+            throw new AuraHandledException('Improvement type is required.');
+        }
 
         Idea__c idea = new Idea__c();
         idea.Title__c = title;
@@ -242,7 +245,7 @@ public with sharing class IdeaService {
             LIMIT 1
         ];
         if (!existing.isEmpty()) {
-            throw new AuraHandledException('You have already voted for this idea.');
+            throw new AuraHandledException('You have already liked this idea.');
         }
         Idea_Vote__c vote = new Idea_Vote__c();
         vote.Idea__c = ideaId;

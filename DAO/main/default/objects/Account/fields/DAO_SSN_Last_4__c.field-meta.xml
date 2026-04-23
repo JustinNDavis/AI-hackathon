@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DAO_SSN_Last_4__c</fullName>
+    <description>Last four digits of SSN for Person Account search (DAO). Do not store full SSN here.</description>
+    <externalId>false</externalId>
+    <label>DAO SSN Last 4</label>
+    <length>4</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

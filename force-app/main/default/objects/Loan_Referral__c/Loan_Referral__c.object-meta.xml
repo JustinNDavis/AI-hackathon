@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description>Captured loan referral intake with optional link to an existing account match.</description>
+    <enableActivities>true</enableActivities>
+    <label>Loan Referral</label>
+    <nameField>
+        <displayFormat>LR-{000000}</displayFormat>
+        <label>Referral Number</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>Loan Referrals</pluralLabel>
+    <sharingModel>ReadWrite</sharingModel>
+</CustomObject>

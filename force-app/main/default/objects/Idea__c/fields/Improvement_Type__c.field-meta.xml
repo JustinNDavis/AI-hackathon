@@ -1,38 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Improvement_Type__c</fullName>
-    <description>Type of improvement this idea represents.</description>
+    <description>Type of improvement this idea represents (single classification).</description>
     <externalId>false</externalId>
     <label>Improvement Type</label>
     <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>
-    <type>MultiselectPicklist</type>
-    <visibleLines>4</visibleLines>
+    <type>Picklist</type>
     <valueSet>
         <restricted>true</restricted>
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>Process</fullName>
+                <fullName>Customer_Experience</fullName>
                 <default>false</default>
-                <label>Process</label>
+                <label>Customer experience</label>
             </value>
             <value>
-                <fullName>Policy</fullName>
+                <fullName>Process_Improvement</fullName>
                 <default>false</default>
-                <label>Policy</label>
+                <label>Process improvement</label>
             </value>
             <value>
-                <fullName>Digital</fullName>
+                <fullName>Product_Idea</fullName>
                 <default>false</default>
-                <label>Digital</label>
-            </value>
-            <value>
-                <fullName>Other</fullName>
-                <default>false</default>
-                <label>Other</label>
+                <label>Product idea</label>
             </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>
-

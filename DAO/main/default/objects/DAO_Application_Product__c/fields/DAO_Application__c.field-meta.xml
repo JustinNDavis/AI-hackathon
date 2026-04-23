@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DAO_Application__c</fullName>
+    <label>DAO Application</label>
+    <referenceTo>DAO_Application__c</referenceTo>
+    <relationshipLabel>Application Products</relationshipLabel>
+    <relationshipName>Application_Products</relationshipName>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

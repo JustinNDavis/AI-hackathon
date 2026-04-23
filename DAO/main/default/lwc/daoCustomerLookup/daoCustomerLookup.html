@@ -1,0 +1,559 @@
+<template>
+    <div class="aub-step aub-step--pad">
+        <h2 class="aub-step__title">Customer</h2>
+        <p class="aub-step__lede">
+            Pick the applicant type, then choose <strong>Existing</strong> to search or <strong>Create new</strong> to add a record.
+            Business applications collect signers on the Parties step.
+        </p>
+
+        <div class="customer-setup">
+            <div class="customer-setup__row">
+                <span class="customer-setup__label" id="customer-setup-applicant-label">Applicant type</span>
+                <div
+                    class="lookup-mode-bar lookup-mode-bar--fill"
+                    role="radiogroup"
+                    aria-labelledby="customer-setup-applicant-label"
+                >
+                    <button
+                        type="button"
+                        class={entityIndividualSegClass}
+                        data-entity="Individual"
+                        disabled={customerRecordCommitted}
+                        onclick={handleEntityTypeClick}
+                    >
+                        Individual
+                    </button>
+                    <button
+                        type="button"
+                        class={entityBusinessSegClass}
+                        data-entity="Business"
+                        disabled={customerRecordCommitted}
+                        onclick={handleEntityTypeClick}
+                    >
+                        Business
+                    </button>
+                </div>
+            </div>
+            <div class="customer-setup__row customer-setup__row--divider">
+                <span class="customer-setup__label" id="customer-setup-record-label">{customerPathRowLabel}</span>
+                <div
+                    class="lookup-mode-bar lookup-mode-bar--fill"
+                    role="radiogroup"
+                    aria-labelledby="customer-setup-record-label"
+                >
+                    <button
+                        type="button"
+                        class={customerPathSegmentExistingClass}
+                        data-path="existing"
+                        disabled={customerRecordCommitted}
+                        onclick={handleCustomerPathSegmentClick}
+                    >
+                        Existing
+                    </button>
+                    <button
+                        type="button"
+                        class={customerPathSegmentNewClass}
+                        data-path="new"
+                        disabled={customerRecordCommitted}
+                        onclick={handleCustomerPathSegmentClick}
+                    >
+                        Create new
+                    </button>
+                </div>
+            </div>
+            <p class="customer-setup__hint">{customerPathHint}</p>
+        </div>
+
+        <template lwc:if={showExistingPath}>
+            <div class="slds-grid slds-gutters_x-small slds-m-bottom_medium">
+                <div class="slds-col slds-grow">
+                    <lightning-input
+                        type="search"
+                        label="Search"
+                        placeholder={searchPlaceholder}
+                        value={searchInput}
+                        onchange={handleSearchInput}
+                        onkeyup={handleSearchKeyUp}
+                    ></lightning-input>
+                </div>
+                <div class="slds-col slds-no-flex slds-align-bottom">
+                    <lightning-button variant="brand" label="Search" onclick={handleSearch}></lightning-button>
+                </div>
+            </div>
+
+            <template lwc:if={searchError}>
+                <div class="slds-text-color_error slds-m-bottom_small">{searchErrorMessage}</div>
+            </template>
+
+            <template lwc:if={hasResults}>
+                <p class="slds-text-title_caps slds-m-bottom_x-small">Matching records</p>
+                <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                    <template lwc:if={isIndividualEntityPath}>
+                        Compare DOB, mailing and billing addresses, phones, account number, website, and type before selecting the correct person.
+                    </template>
+                    <template lwc:if={isBusinessEntityPath}>
+                        Compare legal name, DBA, billing address, phones, EIN tail, account number, website, and type before selecting the correct business.
+                    </template>
+                </p>
+                <template for:each={rowsWithUi} for:item="row">
+                    <div key={row.id} class={row.itemClass} data-id={row.id} onclick={handleSelectRow}>
+                        <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-start">
+                            <div class="result-row__body">
+                                <p class="result-row__name"><strong>{row.name}</strong></p>
+                                <div class="result-row__details">
+                                    <template lwc:if={isIndividualEntityPath}>
+                                        <template lwc:if={row.firstName}>
+                                            <p class="result-row__meta">
+                                                <span class="result-row__label">First name</span>
+                                                <span class="result-row__value">{row.firstName}</span>
+                                            </p>
+                                        </template>
+                                        <template lwc:if={row.lastName}>
+                                            <p class="result-row__meta">
+                                                <span class="result-row__label">Last name</span>
+                                                <span class="result-row__value">{row.lastName}</span>
+                                            </p>
+                                        </template>
+                                    </template>
+                                    <template lwc:if={row.hasDba}>
+                                        <p class="result-row__meta">
+                                            <span class="result-row__label">DBA</span>
+                                            <span class="result-row__value">{row.dbaName}</span>
+                                        </p>
+                                    </template>
+                                    <template lwc:if={row.hasDob}>
+                                        <p class="result-row__meta">
+                                            <span class="result-row__label">DOB</span>
+                                            <span class="result-row__value">
+                                                <lightning-formatted-date-time
+                                                    value={row.personBirthdate}
+                                                    year="numeric"
+                                                    month="short"
+                                                    day="2-digit"
+                                                    time-zone="UTC"
+                                                ></lightning-formatted-date-time>
+                                            </span>
+                                        </p>
+                                    </template>
+                                    <template lwc:if={row.hasEmail}>
+                                        <p class="result-row__meta">
+                                            <span class="result-row__label">Email</span>
+                                            <span class="result-row__value">{row.personEmail}</span>
+                                        </p>
+                                    </template>
+                                    <template for:each={row.phoneLines} for:item="pl">
+                                        <p key={pl.key} class="result-row__meta">
+                                            <span class="result-row__label">{pl.label}</span>
+                                            <span class="result-row__value">{pl.value}</span>
+                                        </p>
+                                    </template>
+                                    <template lwc:if={row.hasAccountNumber}>
+                                        <p class="result-row__meta">
+                                            <span class="result-row__label">Account #</span>
+                                            <span class="result-row__value">{row.accountNumber}</span>
+                                        </p>
+                                    </template>
+                                    <p class="result-row__meta">
+                                        <span class="result-row__label">Type</span>
+                                        <span class="result-row__value">{row.accountTypeDisplay}</span>
+                                    </p>
+                                    <template lwc:if={row.hasWebsite}>
+                                        <p class="result-row__meta">
+                                            <span class="result-row__label">Website</span>
+                                            <span class="result-row__value">{row.website}</span>
+                                        </p>
+                                    </template>
+                                    <template lwc:if={row.hasStreet}>
+                                        <p class="result-row__meta">
+                                            <span class="result-row__label">Mailing street</span>
+                                            <span class="result-row__value">{row.personMailingStreet}</span>
+                                        </p>
+                                    </template>
+                                    <template lwc:if={row.cityStateZip}>
+                                        <p class="result-row__meta">
+                                            <span class="result-row__label">Mailing city / ZIP</span>
+                                            <span class="result-row__value">{row.cityStateZip}</span>
+                                        </p>
+                                    </template>
+                                    <template lwc:if={row.hasBillingStreet}>
+                                        <p class="result-row__meta">
+                                            <span class="result-row__label">Billing street</span>
+                                            <span class="result-row__value">{row.billingStreet}</span>
+                                        </p>
+                                    </template>
+                                    <template lwc:if={row.billingCityStateZip}>
+                                        <p class="result-row__meta">
+                                            <span class="result-row__label">Billing city / ZIP</span>
+                                            <span class="result-row__value">{row.billingCityStateZip}</span>
+                                        </p>
+                                    </template>
+                                </div>
+                            </div>
+                            <template lwc:if={row.ssnLast4}>
+                                <span class="slds-badge slds-shrink-none slds-m-left_small">SSN ··{row.ssnLast4}</span>
+                            </template>
+                            <template lwc:if={row.einLast4}>
+                                <span class="slds-badge slds-shrink-none slds-m-left_small">EIN ··{row.einLast4}</span>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </template>
+
+            <template lwc:if={individualSelectionDetail}>
+                <div class="selected-customer-card">
+                    <p class="selected-customer-card__eyebrow">Selected customer</p>
+                    <h3 class="selected-customer-card__title">{individualSelectionDetail.displayName}</h3>
+                    <div class="selected-customer-card__grid">
+                        <template lwc:if={individualSelectionDetail.hasAccountNumber}>
+                            <div class="selected-customer-card__field">
+                                <span class="selected-customer-card__label">Account number</span>
+                                <span class="selected-customer-card__value">{individualSelectionDetail.accountNumber}</span>
+                            </div>
+                        </template>
+                        <div class="selected-customer-card__field">
+                            <span class="selected-customer-card__label">Account type</span>
+                            <span class="selected-customer-card__value">{individualSelectionDetail.accountTypeDisplay}</span>
+                        </div>
+                        <template lwc:if={individualSelectionDetail.hasWebsite}>
+                            <div class="selected-customer-card__field selected-customer-card__field--wide">
+                                <span class="selected-customer-card__label">Website</span>
+                                <span class="selected-customer-card__value">{individualSelectionDetail.website}</span>
+                            </div>
+                        </template>
+                        <template lwc:if={individualSelectionDetail.hasFirstName}>
+                            <div class="selected-customer-card__field">
+                                <span class="selected-customer-card__label">First name</span>
+                                <span class="selected-customer-card__value">{individualSelectionDetail.firstName}</span>
+                            </div>
+                        </template>
+                        <template lwc:if={individualSelectionDetail.hasLastName}>
+                            <div class="selected-customer-card__field">
+                                <span class="selected-customer-card__label">Last name</span>
+                                <span class="selected-customer-card__value">{individualSelectionDetail.lastName}</span>
+                            </div>
+                        </template>
+                        <template lwc:if={individualSelectionDetail.hasEmail}>
+                            <div class="selected-customer-card__field selected-customer-card__field--wide">
+                                <span class="selected-customer-card__label">Email</span>
+                                <span class="selected-customer-card__value">{individualSelectionDetail.personEmail}</span>
+                            </div>
+                        </template>
+                        <template lwc:if={individualSelectionDetail.hasDob}>
+                            <div class="selected-customer-card__field">
+                                <span class="selected-customer-card__label">Date of birth</span>
+                                <span class="selected-customer-card__value">
+                                    <lightning-formatted-date-time
+                                        value={individualSelectionDetail.personBirthdate}
+                                        year="numeric"
+                                        month="short"
+                                        day="2-digit"
+                                        time-zone="UTC"
+                                    ></lightning-formatted-date-time>
+                                </span>
+                            </div>
+                        </template>
+                        <template lwc:if={individualSelectionDetail.ssnLast4}>
+                            <div class="selected-customer-card__field">
+                                <span class="selected-customer-card__label">SSN (last 4)</span>
+                                <span class="selected-customer-card__value">··{individualSelectionDetail.ssnLast4}</span>
+                            </div>
+                        </template>
+                        <template for:each={individualSelectionDetail.phoneLines} for:item="pl">
+                            <div key={pl.key} class="selected-customer-card__field">
+                                <span class="selected-customer-card__label">{pl.label}</span>
+                                <span class="selected-customer-card__value">{pl.value}</span>
+                            </div>
+                        </template>
+                        <template lwc:if={individualSelectionDetail.hasMailing}>
+                            <div class="selected-customer-card__field selected-customer-card__field--wide">
+                                <span class="selected-customer-card__label">Mailing address</span>
+                                <span class="selected-customer-card__value selected-customer-card__value--multiline">{individualSelectionDetail.mailingFormatted}</span>
+                            </div>
+                        </template>
+                        <template lwc:if={individualSelectionDetail.billingSameAsMailing}>
+                            <div class="selected-customer-card__field selected-customer-card__field--wide">
+                                <span class="selected-customer-card__label">Billing address</span>
+                                <span class="selected-customer-card__value selected-customer-card__muted">Same as mailing</span>
+                            </div>
+                        </template>
+                        <template lwc:if={individualSelectionDetail.hasBillingDistinct}>
+                            <div class="selected-customer-card__field selected-customer-card__field--wide">
+                                <span class="selected-customer-card__label">Billing address</span>
+                                <span class="selected-customer-card__value selected-customer-card__value--multiline">{individualSelectionDetail.billingFormatted}</span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            <template lwc:if={selectedRow}>
+                <div class="lookup-existing-actions">
+                    <p class="lookup-existing-actions__hint slds-text-body_small slds-text-color_weak">
+                        Confirm the <strong>highlighted</strong> row, complete verification below, then continue.
+                    </p>
+                    <div class="lookup-existing-actions__row">
+                        <lightning-input
+                            type="checkbox"
+                            label={identityConfirmLabel}
+                            checked={identityVerified}
+                            onchange={handleIdentityChange}
+                            class="lookup-existing-actions__check"
+                        ></lightning-input>
+                        <lightning-button
+                            variant="brand"
+                            label={continueWithSelectedLabel}
+                            onclick={handleConfirmExisting}
+                            disabled={existingContinueDisabled}
+                            class="lookup-existing-actions__btn"
+                        ></lightning-button>
+                    </div>
+                </div>
+            </template>
+
+            <template lwc:if={showNoResultsPanel}>
+                <div class="slds-m-top_medium aub-lookup-panel slds-text-align_center">
+                    <template lwc:if={isIndividualEntityPath}>
+                        <p class="slds-text-body_regular slds-m-bottom_x-small">No Person Accounts matched your search.</p>
+                        <p class="slds-text-body_small slds-text-color_weak">
+                            Try different terms, or choose <strong>Create new</strong> to add a new record.
+                        </p>
+                    </template>
+                    <template lwc:if={isBusinessEntityPath}>
+                        <p class="slds-text-body_regular slds-m-bottom_x-small">No business Accounts matched your search.</p>
+                        <p class="slds-text-body_small slds-text-color_weak">
+                            Try different terms, or choose <strong>Create new</strong> to add a new business Account.
+                        </p>
+                    </template>
+                </div>
+            </template>
+        </template>
+
+        <template lwc:if={showNewPath}>
+            <div class="aub-lookup-panel">
+                <template lwc:if={customerRecordCommitted}>
+                    <p class="slds-text-body_small slds-m-bottom_small slds-text-color_success">{linkedAccountBanner}</p>
+                </template>
+
+                <template lwc:if={isIndividualEntityPath}>
+                    <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_medium">
+                        <span class="slds-badge slds-theme_success">Net new</span>
+                        <span class="slds-text-heading_small slds-m-left_small">New Person Account</span>
+                    </div>
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-input
+                                data-field="firstName"
+                                label="First name"
+                                value={newFirstName}
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-input
+                                data-field="lastName"
+                                label="Last name"
+                                value={newLastName}
+                                required
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-input
+                                data-field="dob"
+                                type="date"
+                                label="Date of birth"
+                                value={newDob}
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-input
+                                data-field="ssn"
+                                type="password"
+                                label="SSN (only last four digits are stored)"
+                                value={newSsn}
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input
+                                data-field="street"
+                                label="Street"
+                                value={newStreet}
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-input
+                                data-field="city"
+                                label="City"
+                                value={newCity}
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+                            <lightning-input
+                                data-field="state"
+                                label="State"
+                                value={newState}
+                                maxlength="80"
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+                            <lightning-input
+                                data-field="postal"
+                                label="Postal code"
+                                value={newPostal}
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-input
+                                data-field="phone"
+                                type="tel"
+                                label="Phone"
+                                value={newPhone}
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-input
+                                data-field="email"
+                                type="email"
+                                label="Email"
+                                value={newEmail}
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                    </div>
+                </template>
+
+                <template lwc:if={isBusinessEntityPath}>
+                    <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_medium">
+                        <span class="slds-badge slds-theme_success">Net new</span>
+                        <span class="slds-text-heading_small slds-m-left_small">New business Account</span>
+                    </div>
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input
+                                data-field="legalName"
+                                label="Legal business name"
+                                value={newLegalName}
+                                required
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-input
+                                data-field="dba"
+                                label="DBA (optional)"
+                                value={newDba}
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-input
+                                data-field="ein"
+                                type="password"
+                                label="EIN (only last four digits are stored)"
+                                value={newEin}
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input
+                                data-field="street"
+                                label="Billing street"
+                                value={newStreet}
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-input
+                                data-field="city"
+                                label="City"
+                                value={newCity}
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+                            <lightning-input
+                                data-field="state"
+                                label="State"
+                                value={newState}
+                                maxlength="80"
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+                            <lightning-input
+                                data-field="postal"
+                                label="Postal code"
+                                value={newPostal}
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-input
+                                data-field="phone"
+                                type="tel"
+                                label="Phone"
+                                value={newPhone}
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-input
+                                data-field="email"
+                                type="email"
+                                label="Business email"
+                                value={newEmail}
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input
+                                data-field="website"
+                                type="url"
+                                label="Website (optional)"
+                                value={newWebsite}
+                                onchange={handleNewFieldChange}
+                                disabled={customerRecordCommitted}
+                            ></lightning-input>
+                        </div>
+                    </div>
+                </template>
+
+                <div class="slds-m-top_medium">
+                    <lightning-button
+                        variant="brand"
+                        label={createButtonLabel}
+                        onclick={handleCreateNetNew}
+                        disabled={creatingOrCommitted}
+                    ></lightning-button>
+                </div>
+            </div>
+        </template>
+    </div>
+</template>

@@ -24,7 +24,12 @@
                 </lightning-textarea>
                 <div class="comment-reply-actions">
                     <lightning-button label="Cancel" variant="neutral" onclick={handleReplyCancel}></lightning-button>
-                    <lightning-button label="Reply" variant="brand" onclick={handleReplySubmit} disabled={replying}></lightning-button>
+                    <lightning-button
+                        label="Reply"
+                        variant="brand"
+                        class="aub-brand-btn"
+                        onclick={handleReplySubmit}
+                        disabled={replying}></lightning-button>
                 </div>
             </div>
         </template>

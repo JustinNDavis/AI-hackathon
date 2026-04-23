@@ -1,0 +1,77 @@
+<template>
+    <lightning-card title="DAO application" icon-name="standard:client">
+        <template lwc:if={wiredLoading}>
+            <div class="slds-p-around_medium">
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </div>
+        </template>
+        <template lwc:elseif={wiredError}>
+            <div class="slds-text-color_error slds-p-around_medium">{errorMessage}</div>
+        </template>
+        <template lwc:elseif={hasRecord}>
+            <div class="slds-p-horizontal_medium slds-p-bottom_small">
+                <dl class="slds-grid slds-wrap slds-gutters_x-small field-list">
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                        <dt class="slds-text-title_caps slds-text-color_weak">Application #</dt>
+                        <dd class="slds-text-body_regular slds-m-bottom_small">{nameVal}</dd>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                        <dt class="slds-text-title_caps slds-text-color_weak">Status</dt>
+                        <dd class="slds-text-body_regular slds-m-bottom_small">{statusVal}</dd>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                        <dt class="slds-text-title_caps slds-text-color_weak">Current step</dt>
+                        <dd class="slds-text-body_regular slds-m-bottom_small">{stepVal}</dd>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                        <dt class="slds-text-title_caps slds-text-color_weak">Application date</dt>
+                        <dd class="slds-text-body_regular slds-m-bottom_small">
+                            <template lwc:if={dateVal}>
+                                <lightning-formatted-date-time value={dateVal}></lightning-formatted-date-time>
+                            </template>
+                            <template lwc:else>—</template>
+                        </dd>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                        <dt class="slds-text-title_caps slds-text-color_weak">Customer type</dt>
+                        <dd class="slds-text-body_regular slds-m-bottom_small">{custVal}</dd>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                        <dt class="slds-text-title_caps slds-text-color_weak">KYC</dt>
+                        <dd class="slds-text-body_regular slds-m-bottom_small">{kycVal}</dd>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                        <dt class="slds-text-title_caps slds-text-color_weak">ChexSystems</dt>
+                        <dd class="slds-text-body_regular slds-m-bottom_small">{chexVal}</dd>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                        <dt class="slds-text-title_caps slds-text-color_weak">Funding method</dt>
+                        <dd class="slds-text-body_regular slds-m-bottom_small">{fundingVal}</dd>
+                    </div>
+                </dl>
+                <lightning-button variant="brand" label="Launch Wizard" onclick={openModal} class="slds-m-top_x-small"></lightning-button>
+            </div>
+        </template>
+
+        <template lwc:if={showModal}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" aria-modal="true">
+                <div class="slds-modal__container dao-wizard-modal">
+                    <header class="slds-modal__header">
+                        <lightning-button-icon
+                            class="slds-modal__close"
+                            icon-name="utility:close"
+                            alternative-text="Close"
+                            variant="bare-inverse"
+                            onclick={closeModal}
+                        ></lightning-button-icon>
+                        <h2 class="slds-modal__title slds-hyphenate">Deposit account opening wizard</h2>
+                    </header>
+                    <div class="slds-modal__content dao-wizard-modal__body slds-p-around_medium">
+                        <c-dao-wizard record-id={recordId} ondaowizardcomplete={handleWizardComplete}></c-dao-wizard>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+    </lightning-card>
+</template>

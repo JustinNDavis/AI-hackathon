@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Applicant_Entity_Type__c</fullName>
+    <description>Whether the primary customer on this DAO application is an individual (Person Account) or a business entity (Account).</description>
+    <externalId>false</externalId>
+    <label>Applicant entity type</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Individual</fullName>
+                <default>true</default>
+                <label>Individual</label>
+            </value>
+            <value>
+                <fullName>Business</fullName>
+                <default>false</default>
+                <label>Business</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,114 @@
+<template>
+    <div class="aub-step aub-step--pad">
+        <h2 class="aub-step__title">{chexStepTitle}</h2>
+
+        <template lwc:if={showMockOutcomeBar}>
+            <div class="chex-mock-bar">
+                <p class="chex-mock-bar__title">Demo — mock outcome</p>
+                <lightning-button
+                    variant="neutral"
+                    label="Clear"
+                    title="Force a clear Chex / BizChex result"
+                    onclick={handleMockChexClear}
+                    disabled={isLoading}
+                ></lightning-button>
+                <lightning-button
+                    variant="neutral"
+                    label="Review"
+                    title="Force a review (manual follow-up) result"
+                    onclick={handleMockChexReview}
+                    disabled={isLoading}
+                ></lightning-button>
+                <lightning-button
+                    variant="neutral"
+                    label="Decline"
+                    title="Force a decline (override path) result"
+                    onclick={handleMockChexDecline}
+                    disabled={isLoading}
+                ></lightning-button>
+            </div>
+            <p class="chex-mock-bar__sub slds-m-bottom_medium">{chexMockBarSubtext}</p>
+        </template>
+
+        <template lwc:if={isSkipped}>
+            <p class="aub-step__muted">{skipMessage}</p>
+        </template>
+
+        <template lwc:if={isLoading}>
+            <div class="aub-loader-stage" role="status" aria-live="polite">
+                <div class="aub-loader" aria-hidden="true">
+                    <div class="aub-loader__ring"></div>
+                    <div class="aub-loader__ring aub-loader__ring--lag"></div>
+                    <div class="aub-loader__pulse"></div>
+                </div>
+                <p class="aub-loader__caption">{chexLoadingCaption}</p>
+                <p class="aub-loader__sub">{chexLoadingSub}</p>
+            </div>
+        </template>
+
+        <template lwc:if={isError}>
+            <p class="slds-text-color_error slds-m-bottom_small">{chexResult.errorMessage}</p>
+            <lightning-button variant="neutral" label="Retry" onclick={handleRetry}></lightning-button>
+        </template>
+
+        <template lwc:if={isResult}>
+            <template lwc:if={showDeclineAlert}>
+                <div class="chex-decline-alert" role="alert">
+                    <span class="slds-assistive-text">error</span>
+                    <div class="chex-decline-alert__main">
+                        <lightning-icon
+                            icon-name="utility:error"
+                            alternative-text="Decline"
+                            size="small"
+                            class="chex-decline-alert__icon"
+                            variant="inverse"
+                        ></lightning-icon>
+                        <div class="chex-decline-alert__copy">
+                            <p class="chex-decline-alert__title">{chexDeclineHeading}</p>
+                            <p class="chex-decline-alert__body">
+                                A manager override is required to proceed. This action is logged for audit (mock flow).
+                            </p>
+                        </div>
+                    </div>
+                    <div class="chex-decline-alert__actions">
+                        <lightning-button
+                            variant="neutral"
+                            label="Request Override"
+                            onclick={handleRequestOverride}
+                        ></lightning-button>
+                    </div>
+                </div>
+            </template>
+
+            <div class="slds-grid slds-wrap slds-gutters">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                    <p class="slds-text-title_caps slds-m-bottom_x-small">Risk score</p>
+                    <p class="chex-score-readout slds-text-heading_large slds-m-bottom_x-small">{chexResult.score}</p>
+                    <lightning-progress-bar value={gaugePercent} size="large"></lightning-progress-bar>
+                    <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">{chexScoreFootnote}</p>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-grid slds-grid_vertical-align-center">
+                    <div>
+                        <p class="slds-text-title_caps slds-m-bottom_x-small">Status</p>
+                        <span class={statusBadgeClass}>{statusBadgeLabel}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slds-m-top_medium">
+                <p class="slds-text-title_caps slds-m-bottom_x-small">{chexHistorySectionTitle}</p>
+                <template lwc:if={showHistoryTable}>
+                    <lightning-datatable
+                        key-field="id"
+                        data={historyRows}
+                        columns={historyColumns}
+                        hide-checkbox-column
+                    ></lightning-datatable>
+                </template>
+                <template lwc:if={historyEmpty}>
+                    <p class="slds-text-body_small slds-text-color_weak">{chexHistoryEmptyMessage}</p>
+                </template>
+            </div>
+        </template>
+    </div>
+</template>

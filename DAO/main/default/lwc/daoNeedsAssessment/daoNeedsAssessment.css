@@ -1,0 +1,30 @@
+:host {
+    color-scheme: light;
+    --aub-text: #153e5c;
+    --aub-muted: #5a7288;
+    --aub-font-display: Georgia, 'Times New Roman', 'Liberation Serif', serif;
+    --aub-font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--aub-text);
+    font-family: var(--aub-font-ui);
+    -webkit-font-smoothing: antialiased;
+}
+
+.aub-step--pad {
+    padding: 1.75rem 2rem 2rem;
+}
+
+.aub-step__title {
+    font-family: var(--aub-font-display);
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin: 0 0 0.35rem;
+    color: #1a5296;
+}
+
+.aub-step__lede {
+    margin: 0 0 1.25rem;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--aub-muted);
+    max-width: 42rem;
+}

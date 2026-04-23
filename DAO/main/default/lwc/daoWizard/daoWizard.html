@@ -1,0 +1,118 @@
+<template>
+    <div class="aub-shell">
+        <div class="aub-shell__glow" aria-hidden="true"></div>
+        <div class="aub-shell__noise" aria-hidden="true"></div>
+
+        <header class="aub-header">
+            <div class="aub-brand">
+                <img
+                    class="aub-brand__logo"
+                    src={aubBrandLogoUrl}
+                    alt="Atlantic Union Bank"
+                    width="239"
+                    height="56"
+                    loading="eager"
+                />
+                <div class="aub-brand__text">
+                    <span class="aub-brand__product">Deposit account opening</span>
+                </div>
+            </div>
+            <div class="aub-header__meta">
+                <span class="aub-pill">
+                    Step <strong>{displayStepIndex}</strong> / {totalVisibleSteps}
+                </span>
+                <template lwc:if={applicationIdDisplay}>
+                    <span class="aub-app-id">Ref · {applicationIdDisplay}</span>
+                </template>
+            </div>
+        </header>
+
+        <div class="aub-progress-block">
+            <div class="aub-progress__labels">
+                <span class="aub-progress__title">{currentStepTitle}</span>
+                <span class="aub-progress__pct">{progressDisplayPct}%</span>
+            </div>
+            <div class="aub-progress__track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow={progressBarValue}>
+                <div class="aub-progress__fill" style={progressFillStyle}></div>
+                <div class="aub-progress__sheen" style={progressFillStyle}></div>
+            </div>
+        </div>
+
+        <main class="aub-main">
+            <div class="aub-main__inner">
+                <template lwc:if={isStep1}>
+                    <c-dao-customer-lookup
+                        application-data={applicationData}
+                        ondaowizarddatapatch={handleDataPatch}
+                        ondaocustomercomplete={handleCustomerComplete}
+                    ></c-dao-customer-lookup>
+                </template>
+                <template lwc:if={isStep2}>
+                    <c-dao-needs-assessment
+                        application-data={applicationData}
+                        ondaowizarddatapatch={handleDataPatch}
+                    ></c-dao-needs-assessment>
+                </template>
+                <template lwc:if={isStep3}>
+                    <c-dao-party-gather application-data={applicationData} ondaowizarddatapatch={handleDataPatch}></c-dao-party-gather>
+                </template>
+                <template lwc:if={isStep4}>
+                    <c-dao-product-selection
+                        application-data={applicationData}
+                        ondaowizarddatapatch={handleDataPatch}
+                        ondaoproductselectioncomplete={handleProductSelectionComplete}
+                    ></c-dao-product-selection>
+                </template>
+                <template lwc:if={isStep5}>
+                    <c-dao-confirmation application-data={applicationData} ondaowizarddatapatch={handleDataPatch}></c-dao-confirmation>
+                </template>
+                <template lwc:if={isStep6}>
+                    <c-dao-kyc-status
+                        application-data={applicationData}
+                        ondaowizarddatapatch={handleDataPatch}
+                        ondaowizardrequestnav={handleWizardRequestNav}
+                    ></c-dao-kyc-status>
+                </template>
+                <template lwc:if={isStep7}>
+                    <c-dao-banker-review
+                        application-data={applicationData}
+                        ondaowizarddatapatch={handleDataPatch}
+                        ondaogotostep={handleGotoStep}
+                    ></c-dao-banker-review>
+                </template>
+                <template lwc:if={isStep8}>
+                    <c-dao-chex-systems application-data={applicationData} ondaowizarddatapatch={handleDataPatch}></c-dao-chex-systems>
+                </template>
+                <template lwc:if={isStep9}>
+                    <c-dao-ancillary-services application-data={applicationData} ondaowizarddatapatch={handleDataPatch}></c-dao-ancillary-services>
+                </template>
+                <template lwc:if={isStep10}>
+                    <c-dao-funding
+                        application-data={applicationData}
+                        ondaowizarddatapatch={handleDataPatch}
+                        ondaowizardfundingcomplete={handleFundingComplete}
+                    ></c-dao-funding>
+                </template>
+            </div>
+        </main>
+
+        <footer class="aub-footer">
+            <button
+                type="button"
+                class="aub-btn aub-btn--ghost"
+                onclick={handleBack}
+                disabled={isFirstVisibleStep}
+            >
+                Back
+            </button>
+            <button
+                type="button"
+                class="aub-btn aub-btn--primary"
+                onclick={handleNext}
+                disabled={nextButtonDisabled}
+            >
+                {nextButtonLabel}
+            </button>
+        </footer>
+    </div>
+</template>

@@ -39,7 +39,7 @@ private class IdeaServiceTest {
             'Improve onboarding emails',
             'This is a test idea to improve the onboarding email experience.',
             'Open',
-            'Process;Digital',
+            'Process_Improvement',
             'Reduces time to value for new customers',
             'onboarding;email'
         );
@@ -52,8 +52,27 @@ private class IdeaServiceTest {
     }
 
     @IsTest
+    static void test_createIdea_requiresImprovementType() {
+        Boolean threw = false;
+        try {
+            IdeaService.createIdea(
+                'No improvement type',
+                'This description has enough words to pass the word count validation rule.',
+                'Open',
+                null,
+                null,
+                null
+            );
+        } catch (AuraHandledException e) {
+            threw = true;
+            System.assert(e.getMessage().contains('Improvement type'), 'Expected improvement type validation message');
+        }
+        System.assert(threw, 'Expected error when improvement type is blank');
+    }
+
+    @IsTest
     static void test_updateStatus_requiresNotes_forImplemented() {
-        Id ideaId = IdeaService.createIdea('Improve support response times', 'Another idea description with enough words for validation.', 'Open', null, null, null);
+        Id ideaId = IdeaService.createIdea('Improve support response times', 'Another idea description with enough words for validation.', 'Open', 'Product_Idea', null, null);
 
         // Elevate to admin for status changes
         User adminUser = [SELECT Id FROM User WHERE Alias = 'idadmin' LIMIT 1];
@@ -78,7 +97,7 @@ private class IdeaServiceTest {
 
     @IsTest
     static void test_statusTransition_acknowledged_only_from_under_review() {
-        Id ideaId = IdeaService.createIdea('Improve invoice layout', 'This is a third test idea description that should pass word count.', 'Open', null, null, null);
+        Id ideaId = IdeaService.createIdea('Improve invoice layout', 'This is a third test idea description that should pass word count.', 'Open', 'Product_Idea', null, null);
 
         User adminUser = [SELECT Id FROM User WHERE Alias = 'idadmin' LIMIT 1];
         System.runAs(adminUser) {
@@ -98,7 +117,7 @@ private class IdeaServiceTest {
 
     @IsTest
     static void test_updateVisibility_and_comments() {
-        Id ideaId = IdeaService.createIdea('Improve search experience', 'This idea is to improve search so that users can find things faster.', 'Private', null, null, null);
+        Id ideaId = IdeaService.createIdea('Improve search experience', 'This idea is to improve search so that users can find things faster.', 'Private', 'Customer_Experience', null, null);
 
         Test.startTest();
         // Creator changes visibility
@@ -135,7 +154,7 @@ private class IdeaServiceTest {
 
     @IsTest
     static void test_voteAndUnvote() {
-        Id ideaId = IdeaService.createIdea('Vote test idea', 'This idea tests the voting feature with enough words.', 'Open', null, null, null);
+        Id ideaId = IdeaService.createIdea('Vote test idea', 'This idea tests the voting feature with enough words.', 'Open', 'Product_Idea', null, null);
 
         Test.startTest();
         IdeaService.voteIdea(ideaId);
@@ -151,7 +170,7 @@ private class IdeaServiceTest {
 
     @IsTest
     static void test_voteTwiceThrows() {
-        Id ideaId = IdeaService.createIdea('Double vote test', 'This idea tests that double voting is prevented.', 'Open', null, null, null);
+        Id ideaId = IdeaService.createIdea('Double vote test', 'This idea tests that double voting is prevented.', 'Open', 'Product_Idea', null, null);
         IdeaService.voteIdea(ideaId);
 
         Boolean threw = false;
@@ -165,7 +184,7 @@ private class IdeaServiceTest {
 
     @IsTest
     static void test_getTopIdeas() {
-        Id ideaId = IdeaService.createIdea('Top idea test', 'This idea has votes for top ideas test.', 'Open', null, null, null);
+        Id ideaId = IdeaService.createIdea('Top idea test', 'This idea has votes for top ideas test.', 'Open', 'Product_Idea', null, null);
         insert new Idea_Vote__c(Idea__c = ideaId, Voter__c = UserInfo.getUserId());
 
         List<Idea__c> top = IdeaService.getTopIdeas(5);
@@ -174,7 +193,7 @@ private class IdeaServiceTest {
 
     @IsTest
     static void test_getIdeasByStatusForChart() {
-        IdeaService.createIdea('Chart test idea', 'This idea is for testing the chart data aggregation.', 'Open', null, null, null);
+        IdeaService.createIdea('Chart test idea', 'This idea is for testing the chart data aggregation.', 'Open', 'Process_Improvement', null, null);
 
         List<ChartDataPoint> points = IdeaService.getIdeasByStatusForChart();
         System.assert(points != null, 'Chart data should not be null');

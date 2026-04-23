@@ -3,6 +3,10 @@
     {
       "path": "force-app",
       "default": true
+    },
+    {
+      "path": "DAO",
+      "default": false
     }
   ],
   "name": "AI-hackathon",

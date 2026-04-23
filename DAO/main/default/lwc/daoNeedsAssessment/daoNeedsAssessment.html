@@ -1,0 +1,51 @@
+<template>
+    <div class="aub-step aub-step--pad">
+        <h2 class="aub-step__title">Needs assessment</h2>
+        <p class="aub-step__lede">{needsAssessmentLede}</p>
+
+        <div class="slds-form slds-form_stacked">
+            <lightning-combobox
+                name="purposeOfAccount"
+                label="Purpose of account"
+                value={purposeOfAccount}
+                placeholder="Select purpose"
+                options={purposeOptions}
+                onchange={handlePurposeChange}
+                required
+            ></lightning-combobox>
+
+            <lightning-combobox
+                class="slds-m-top_small"
+                name="anticipatedMonthlyDepositsRange"
+                label="Anticipated monthly deposits"
+                value={anticipatedMonthlyDepositsRange}
+                placeholder="Select a range"
+                options={depositRangeOptions}
+                onchange={handleDepositRangeChange}
+                required
+                field-level-help="Estimated total deposits per month across all channels."
+            ></lightning-combobox>
+
+            <lightning-combobox
+                class="slds-m-top_small"
+                name="primarySourceOfFunds"
+                label="Primary source of funds"
+                value={primarySourceOfFunds}
+                placeholder="Select primary source"
+                options={sourceOptions}
+                onchange={handleSourceChange}
+                required
+            ></lightning-combobox>
+
+            <lightning-textarea
+                class="slds-m-top_small"
+                name="specialCircumstances"
+                label="Any special circumstances"
+                placeholder={specialCircumstancesPlaceholder}
+                value={specialCircumstances}
+                onchange={handleCircumstancesChange}
+                max-length="2000"
+            ></lightning-textarea>
+        </div>
+    </div>
+</template>

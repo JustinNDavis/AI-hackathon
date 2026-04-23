@@ -4,22 +4,23 @@ import chartJs from '@salesforce/resourceUrl/ChartJS';
 import getIdeasByStatusForChart from '@salesforce/apex/IdeaService.getIdeasByStatusForChart';
 
 // Update ChartJS if your static resource has a different name
+/* DAO / Be Vocal palette — sea, teal, greens, blues */
 const CHART_COLORS = [
-    'rgba(0, 122, 255, 0.85)',
-    'rgba(52, 199, 89, 0.85)',
-    'rgba(255, 149, 0, 0.85)',
-    'rgba(255, 59, 48, 0.85)',
-    'rgba(88, 86, 214, 0.85)',
-    'rgba(90, 200, 250, 0.85)',
+    'rgba(61, 159, 217, 0.88)',
+    'rgba(27, 184, 138, 0.88)',
+    'rgba(45, 184, 109, 0.88)',
+    'rgba(43, 124, 198, 0.88)',
+    'rgba(26, 82, 150, 0.88)',
+    'rgba(61, 214, 140, 0.88)',
 ];
 
 const CHART_BORDER_COLORS = [
-    'rgb(0, 122, 255)',
-    'rgb(52, 199, 89)',
-    'rgb(255, 149, 0)',
-    'rgb(255, 59, 48)',
-    'rgb(88, 86, 214)',
-    'rgb(90, 200, 250)',
+    'rgb(61, 159, 217)',
+    'rgb(27, 184, 138)',
+    'rgb(45, 184, 109)',
+    'rgb(43, 124, 198)',
+    'rgb(26, 82, 150)',
+    'rgb(61, 214, 140)',
 ];
 
 export default class IdeaChart extends LightningElement {

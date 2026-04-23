@@ -1,0 +1,217 @@
+<template>
+    <div class="aub-step aub-step--pad">
+        <h2 class="aub-step__title">Parties &amp; signers</h2>
+        <template lwc:if={isBusinessApplicant}>
+            <p class="aub-step__lede">
+                The <strong>business</strong> you selected on the Customer step is the account owner of record. Add people who may sign or act for the
+                business; for each signer, choose their <strong>capacity or role</strong> (officer, member, authorized signer, etc.), not a personal relationship.
+            </p>
+        </template>
+        <template lwc:if={isBusinessApplicantInverse}>
+            <p class="aub-step__lede">
+                The <strong>primary applicant</strong> is the person you selected on the Customer step—the main signer and owner of record on this application.
+                Add joint owners if needed. For accounts opened <strong>for a minor</strong>, that primary should be the <strong>adult custodian or guardian</strong>;
+                the child’s details are captured separately (not as the primary).
+            </p>
+        </template>
+
+        <div class="slds-m-bottom_medium">
+            <template for:each={rowsForUi} for:item="row">
+                <div key={row.key} class="party-card aub-party-card slds-m-bottom_small">
+                    <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-start">
+                        <div>
+                            <span class={row.badgeClassStr}>{row.badgeLabel}</span>
+                            <p class="slds-text-heading_small slds-m-top_x-small slds-m-bottom_none">{row.fullName}</p>
+                            <template lwc:if={row.subLine}>
+                                <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">{row.subLine}</p>
+                            </template>
+                        </div>
+                        <template lwc:if={row.showRemove}>
+                            <lightning-button-icon
+                                icon-name="utility:delete"
+                                alternative-text="Remove party"
+                                variant="border-filled"
+                                data-id={row.partyId}
+                                onclick={handleRemoveParty}
+                                class="slds-m-left_small"
+                            ></lightning-button-icon>
+                        </template>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <div class="slds-m-bottom_medium">
+            <template lwc:if={showJointForm}>
+                <div class="aub-form-panel slds-m-bottom_small">
+                    <p class="aub-form-panel__label slds-m-bottom_small">{jointFormPanelTitle}</p>
+                    <div class="slds-form slds-form_stacked">
+                        <lightning-input
+                            data-field="name"
+                            label="Full legal name"
+                            value={jointFullName}
+                            onchange={handleJointFieldChange}
+                            required
+                        ></lightning-input>
+                        <lightning-input
+                            class="slds-m-top_small"
+                            data-field="dob"
+                            type="date"
+                            label="Date of birth"
+                            value={jointDateOfBirth}
+                            onchange={handleJointFieldChange}
+                        ></lightning-input>
+                        <lightning-input
+                            class="slds-m-top_small"
+                            data-field="ssn"
+                            type="password"
+                            label="SSN"
+                            value={jointSsn}
+                            onchange={handleJointFieldChange}
+                        ></lightning-input>
+                        <lightning-combobox
+                            class="slds-m-top_small"
+                            name="jointRelationship"
+                            label={jointRelationshipFieldLabel}
+                            value={jointRelationship}
+                            placeholder={jointRelationshipPlaceholder}
+                            options={jointRelationshipOptions}
+                            data-field="relationship"
+                            dropdown-alignment="auto"
+                            onchange={handleJointFieldChange}
+                            required
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-m-top_small slds-grid slds-gutters_x-small">
+                        <lightning-button variant="neutral" label="Cancel" onclick={handleToggleJointForm}></lightning-button>
+                        <lightning-button variant="brand" label={addJointSubmitLabel} onclick={handleAddJoint}></lightning-button>
+                    </div>
+                </div>
+            </template>
+            <template lwc:if={showJointFormInverse}>
+                <lightning-button
+                    variant="neutral"
+                    label={addJointPartyLabel}
+                    icon-name="utility:add"
+                    onclick={handleToggleJointForm}
+                ></lightning-button>
+            </template>
+        </div>
+
+        <template lwc:if={showCustodialSection}>
+        <div class="aub-custodial-section slds-m-bottom_medium">
+            <h3 class="aub-subsection-title">Minor or custodial account</h3>
+            <div class="aub-custodial-callout slds-m-bottom_small">
+                <p class="aub-custodial-callout__text">
+                    If this product is for a <strong>child or dependent</strong>, leave the primary applicant as the <strong>adult</strong> who walked through Customer lookup. Check the box only to add the <strong>minor’s</strong> profile — the minor is never the primary applicant here.
+                </p>
+            </div>
+            <div class="slds-form-element">
+                <lightning-input
+                    type="checkbox"
+                    label="Account includes a minor—add the minor’s information below"
+                    checked={isCustodialMinor}
+                    onchange={handleCustodialToggle}
+                    field-level-help="Use when the beneficial owner or named minor is under 18 (or your bank’s custodial rules apply)."
+                ></lightning-input>
+            </div>
+        </div>
+
+        <template lwc:if={isCustodialMinor}>
+            <div class="aub-form-panel slds-m-bottom_medium">
+                <p class="aub-form-panel__label slds-m-bottom_x-small">About the minor</p>
+                <p class="aub-helper-text slds-m-bottom_small">
+                    Legal name and identifiers for the child or dependent. This is separate from the primary applicant (adult) shown in the list above.
+                </p>
+                <lightning-input
+                    data-field="name"
+                    label="Minor’s full legal name"
+                    value={minorFullName}
+                    onchange={handleMinorFieldChange}
+                ></lightning-input>
+                <lightning-input
+                    class="slds-m-top_small"
+                    data-field="dob"
+                    type="date"
+                    label="Minor’s date of birth"
+                    value={minorDateOfBirth}
+                    onchange={handleMinorFieldChange}
+                ></lightning-input>
+                <lightning-input
+                    class="slds-m-top_small"
+                    data-field="ssn"
+                    type="password"
+                    label="Minor’s SSN"
+                    value={minorSsn}
+                    onchange={handleMinorFieldChange}
+                ></lightning-input>
+
+                <div class="aub-form-panel__divider slds-m-top_medium slds-p-top_medium">
+                    <p class="aub-form-panel__label slds-m-bottom_x-small">Adult custodian / guardian</p>
+                    <p class="aub-helper-text slds-m-bottom_small">
+                        Confirm who legally acts for the minor. Usually this is the same person as the primary applicant.
+                    </p>
+                    <lightning-input
+                        type="checkbox"
+                        label="The primary applicant (from Customer lookup) is the custodian or legal guardian for this minor"
+                        checked={primaryIsGuardian}
+                        onchange={handlePrimaryIsGuardianChange}
+                    ></lightning-input>
+
+                    <template lwc:if={primaryIsGuardian}>
+                        <lightning-combobox
+                            class="slds-m-top_small"
+                            name="primaryGuardianRel"
+                            label="That person’s relationship to the minor"
+                            value={guardianRelationshipToMinor}
+                            placeholder="Select relationship"
+                            options={primaryGuardianRelOptions}
+                            dropdown-alignment="auto"
+                            onchange={handlePrimaryGuardianRelChange}
+                        ></lightning-combobox>
+                    </template>
+
+                    <template lwc:if={primaryIsGuardianInverse}>
+                        <p class="aub-helper-text slds-m-top_small slds-m-bottom_small">
+                            The custodian is <strong>someone other than</strong> the primary applicant. Enter that adult’s details here.
+                        </p>
+                        <lightning-input
+                            class="slds-m-top_small"
+                            data-field="name"
+                            label="Custodian’s full legal name"
+                            value={guardianFullName}
+                            onchange={handleOtherGuardianInputChange}
+                        ></lightning-input>
+                        <lightning-input
+                            class="slds-m-top_small"
+                            data-field="dob"
+                            type="date"
+                            label="Custodian’s date of birth"
+                            value={guardianDateOfBirth}
+                            onchange={handleOtherGuardianInputChange}
+                        ></lightning-input>
+                        <lightning-input
+                            class="slds-m-top_small"
+                            data-field="ssn"
+                            type="password"
+                            label="Custodian’s SSN"
+                            value={guardianSsn}
+                            onchange={handleOtherGuardianInputChange}
+                        ></lightning-input>
+                        <lightning-combobox
+                            class="slds-m-top_small"
+                            name="guardianRelationship"
+                            label="Custodian’s relationship to the minor"
+                            value={guardianRelationship}
+                            placeholder="Select relationship"
+                            options={otherGuardianRelOptions}
+                            dropdown-alignment="auto"
+                            onchange={handleOtherGuardianRelChange}
+                        ></lightning-combobox>
+                    </template>
+                </div>
+            </div>
+        </template>
+        </template>
+    </div>
+</template>

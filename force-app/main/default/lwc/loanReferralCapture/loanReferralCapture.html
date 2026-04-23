@@ -1,0 +1,134 @@
+<template>
+    <div class="launch-wrap">
+        <button type="button" class="launch-btn" onclick={openModal}>
+            <span class="launch-icon" aria-hidden="true">◇</span>
+            <span class="launch-text">Capture loan referral</span>
+        </button>
+    </div>
+
+    <template lwc:if={showModal}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open referral-modal" aria-modal="true" onkeydown={handleModalKeydown}>
+            <div class="slds-modal__container referral-modal__inner">
+                <header class="slds-modal__header referral-modal__header">
+                    <button type="button" class="slds-button slds-button_icon slds-modal__close referral-close" title="Close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close" alternative-text="Close" size="small"></lightning-icon>
+                    </button>
+                    <h2 class="slds-modal__title slds-hyphenate referral-title">New loan referral</h2>
+                    <p class="referral-subtitle">Enter applicant details, find similar accounts, and save the referral.</p>
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium referral-body" id="referral-modal-content">
+                    <div class="referral-grid-form">
+                        <div class="field-group">
+                            <lightning-input
+                                label="First name"
+                                value={firstName}
+                                onchange={handleFirstNameChange}
+                                required
+                                autocomplete="given-name"
+                            ></lightning-input>
+                        </div>
+                        <div class="field-group">
+                            <lightning-input
+                                label="Last name"
+                                value={lastName}
+                                onchange={handleLastNameChange}
+                                required
+                                autocomplete="family-name"
+                            ></lightning-input>
+                        </div>
+                        <div class="field-group field-group_full">
+                            <lightning-input
+                                type="password"
+                                label="Social security number"
+                                value={social}
+                                onchange={handleSocialChange}
+                                autocomplete="off"
+                                placeholder="Enter full SSN — only last four digits are stored on the referral"
+                            ></lightning-input>
+                            <p class="field-hint">Masked entry. Only the last four digits are saved on the referral; account search uses name and phone only.</p>
+                        </div>
+                        <div class="field-group field-group_full">
+                            <lightning-input
+                                type="tel"
+                                label="Phone number"
+                                value={phone}
+                                onchange={handlePhoneChange}
+                                autocomplete="tel"
+                            ></lightning-input>
+                        </div>
+                    </div>
+
+                    <div class="referral-actions-row">
+                        <lightning-button
+                            variant="neutral"
+                            label="Find similar accounts"
+                            onclick={handleSearch}
+                            disabled={disableSearch}
+                        ></lightning-button>
+                        <template lwc:if={searching}>
+                            <lightning-spinner alternative-text="Searching" size="small"></lightning-spinner>
+                        </template>
+                    </div>
+
+                    <template lwc:if={showResultsSection}>
+                        <section class="results-shell" aria-label="Matching accounts">
+                            <div class="results-header">
+                                <h3 class="results-title">Possible matches</h3>
+                                <span class="results-count">{matches.length} found</span>
+                            </div>
+                            <template lwc:if={matches.length}>
+                                <div class="match-grid">
+                                    <template for:each={matchCards} for:item="m">
+                                        <button
+                                            type="button"
+                                            key={m.key}
+                                            class={m.cardClass}
+                                            data-id={m.accountId}
+                                            onclick={handleSelectMatch}
+                                        >
+                                            <span class="match-score" title="Match strength">{m.scoreLabel}</span>
+                                            <span class="match-name">{m.displayName}</span>
+                                            <span class="match-phone">{m.phoneLine}</span>
+                                            <span class="match-reasons">{m.matchSummary}</span>
+                                            <template lwc:if={m.accountId}>
+                                                <span class="match-pick-hint">Select as account link</span>
+                                            </template>
+                                        </button>
+                                    </template>
+                                </div>
+                            </template>
+                            <template lwc:else>
+                                <p class="results-empty">No accounts met the match threshold. You can still save the referral.</p>
+                            </template>
+                        </section>
+                    </template>
+
+                    <section class="assignee-shell" aria-label="Referral owner">
+                        <h3 class="assignee-title">Assign referral</h3>
+                        <p class="assignee-hint">Optional. Search an active user to own this record when you save. Leave empty to keep yourself as owner.</p>
+                        <lightning-record-picker
+                            label="Owner"
+                            placeholder="Search users…"
+                            object-api-name="User"
+                            value={assigneeUserId}
+                            filter={userPickerFilter}
+                            display-info={userPickerDisplayInfo}
+                            onchange={handleAssigneeChange}
+                            disabled={disableSave}
+                        ></lightning-record-picker>
+                    </section>
+                </div>
+
+                <footer class="slds-modal__footer referral-footer">
+                    <lightning-button variant="neutral" label="Cancel" onclick={closeModal} disabled={disableSave}></lightning-button>
+                    <lightning-button variant="brand" label="Save referral" onclick={handleSave} disabled={disableSave}></lightning-button>
+                    <template lwc:if={saving}>
+                        <lightning-spinner alternative-text="Saving" size="small" class="footer-spinner"></lightning-spinner>
+                    </template>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+</template>

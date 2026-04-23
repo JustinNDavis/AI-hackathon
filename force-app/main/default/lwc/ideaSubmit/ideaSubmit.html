@@ -1,112 +1,98 @@
 <template>
-    <div class="ios-container">
-        <lightning-messages></lightning-messages>
+    <div class="aub-shell">
+        <div class="aub-shell__glow" aria-hidden="true"></div>
+        <div class="aub-shell__noise" aria-hidden="true"></div>
 
-        <header class="ios-header">
-            <h1 class="ios-title">New Idea</h1>
-            <p class="ios-subtitle">Share your improvement suggestion</p>
+        <header class="aub-header">
+            <div class="aub-brand">
+                <div class="aub-brand__mark" aria-hidden="true">
+                    <svg class="aub-brand__svg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M24 8c-5.5 0-10 4.2-10 9.4 0 3.6 2 6.8 4.8 8.4V30c0 1.1.9 2 2 2h6.4c1.1 0 2-.9 2-2v-4.2c2.8-1.6 4.8-4.8 4.8-8.4C34 12.2 29.5 8 24 8z"
+                            stroke="currentColor"
+                            stroke-width="2.2"
+                            stroke-linejoin="round"
+                            fill="none"
+                        />
+                        <path d="M18 34h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                        <path d="M20 40h8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                    </svg>
+                </div>
+                <div class="aub-brand__text">
+                    <span class="aub-brand__name">Be Vocal</span>
+                    <span class="aub-brand__product">New idea</span>
+                </div>
+            </div>
+            <div class="aub-header__meta">
+                <span class="aub-pill">Share feedback</span>
+            </div>
         </header>
 
-        <section class="ios-section">
-            <h2 class="ios-section-title">Details</h2>
-            <div class="ios-card">
-                <div class="ios-field">
-                    <label class="ios-label">Title <abbr class="ios-required" title="required">*</abbr></label>
-                    <lightning-input
-                        type="text"
-                        class="ios-input"
-                        value={title}
-                        onchange={handleTitleChange}
-                        variant="label-hidden"
-                        placeholder="What's your idea?"
-                        required>
-                    </lightning-input>
-                </div>
-                <div class="ios-field ios-field-textarea">
-                    <label class="ios-label">Description <abbr class="ios-required" title="required">*</abbr></label>
-                    <lightning-textarea
-                        class="ios-textarea"
-                        value={description}
-                        onchange={handleDescriptionChange}
-                        variant="label-hidden"
-                        placeholder="Describe your idea and its impact (at least 5 words)..."
-                        required>
-                    </lightning-textarea>
-                    <span class="ios-hint">Include at least five words describing the idea and its impact.</span>
-                </div>
-            </div>
-        </section>
+        <main class="aub-main">
+            <div class="aub-main__inner">
+                <div class="aub-step--pad">
+                    <lightning-messages></lightning-messages>
 
-        <section class="ios-section">
-            <h2 class="ios-section-title">Classification</h2>
-            <div class="ios-card">
-                <div class="ios-field">
-                    <lightning-dual-listbox
-                        name="improvementType"
-                        label="Improvement Type"
-                        source-label="Available"
-                        selected-label="Selected"
-                        options={improvementTypeOptions}
-                        value={improvementType}
-                        onchange={handleImprovementTypeChange}>
-                    </lightning-dual-listbox>
-                </div>
-                <div class="ios-field">
-                    <lightning-input
-                        type="text"
-                        label="Customer / Employee Impact"
-                        value={customerImpact}
-                        onchange={handleCustomerImpactChange}
-                        placeholder="How does this help?">
-                    </lightning-input>
-                </div>
-                <div class="ios-field">
-                    <label class="ios-label">Tags</label>
-                    <div class="ios-tag-wrapper">
-                        <template for:each={tagsWithKey} for:item="tag">
-                            <span key={tag.id} class="ios-tag-pill">
-                                {tag.label}
-                                <button type="button" class="ios-tag-remove" data-index={tag.index} onclick={handleRemoveTag} aria-label="Remove tag">×</button>
-                            </span>
-                        </template>
-                        <input
-                            type="text"
-                            class="ios-tag-input"
-                            placeholder="Type a tag, press Enter"
-                            value={tagInput}
-                            oninput={handleTagInputChange}
-                            onkeydown={handleTagKeyDown}
-                        />
+                    <h2 class="aub-step__title">Idea details</h2>
+                    <p class="aub-step__lede">Tell us what would help customers, teammates, or the product — the more context, the better.</p>
+
+                    <div class="aub-form-panel">
+                        <div class="aub-field">
+                            <label class="aub-field__label">Title <abbr class="aub-required" title="required">*</abbr></label>
+                            <lightning-input
+                                type="text"
+                                class="aub-input"
+                                value={title}
+                                onchange={handleTitleChange}
+                                variant="label-hidden"
+                                placeholder="What's your idea?"
+                                required>
+                            </lightning-input>
+                        </div>
+                        <div class="aub-field aub-field--textarea">
+                            <label class="aub-field__label">Description <abbr class="aub-required" title="required">*</abbr></label>
+                            <lightning-textarea
+                                class="aub-textarea"
+                                value={description}
+                                onchange={handleDescriptionChange}
+                                variant="label-hidden"
+                                placeholder="Describe your idea (at least 5 words)..."
+                                required>
+                            </lightning-textarea>
+                            <span class="aub-field__hint">Include at least five words describing the idea.</span>
+                        </div>
+                        <div class="aub-field aub-field--last">
+                            <lightning-combobox
+                                name="improvementType"
+                                label="Improvement Type"
+                                value={improvementType}
+                                placeholder="Select a classification"
+                                options={improvementTypeOptions}
+                                onchange={handleImprovementTypeChange}
+                                dropdown-alignment="auto"
+                                required>
+                            </lightning-combobox>
+                        </div>
                     </div>
-                    <span class="ios-hint">Press Enter or comma to add each tag.</span>
                 </div>
             </div>
-        </section>
+        </main>
 
-        <section class="ios-section">
-            <h2 class="ios-section-title">Visibility</h2>
-            <div class="ios-card">
-                <div class="ios-field">
-                    <lightning-combobox
-                        name="visibility"
-                        label="Who can see this idea"
-                        value={visibility}
-                        options={visibilityOptions}
-                        onchange={handleVisibilityChange}
-                        dropdown-alignment="auto">
-                    </lightning-combobox>
-                </div>
-            </div>
-        </section>
+        <aside class="aub-note-banner" role="note">
+            <p class="aub-note-banner__text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
+                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+            </p>
+        </aside>
 
-        <div class="ios-actions">
+        <footer class="aub-form-footer">
             <lightning-button
                 label="Submit Idea"
                 variant="brand"
-                class="ios-btn ios-btn-primary"
+                class="aub-btn aub-btn--primary"
                 onclick={handleSubmit}
                 disabled={submitting}>
             </lightning-button>
-        </div>
+        </footer>
     </div>
 </template>

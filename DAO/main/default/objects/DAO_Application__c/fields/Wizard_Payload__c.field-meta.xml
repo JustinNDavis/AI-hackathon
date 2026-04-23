@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Wizard_Payload__c</fullName>
+    <description>Optional JSON snapshot of wizard answers for banker resume.</description>
+    <externalId>false</externalId>
+    <label>Wizard Payload</label>
+    <length>131072</length>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>5</visibleLines>
+</CustomField>

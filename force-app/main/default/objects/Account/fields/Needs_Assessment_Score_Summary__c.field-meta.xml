@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Needs_Assessment_Score_Summary__c</fullName>
+    <description>Text summary of Needs Assessment scores by section (e.g., Account Information: 8/10).</description>
+    <externalId>false</externalId>
+    <label>Needs Assessment Score Summary</label>
+    <length>32768</length>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>6</visibleLines>
+</CustomField>

@@ -1,0 +1,56 @@
+<template>
+    <div class="aub-step aub-step--pad">
+        <h2 class="aub-step__title">Product selection</h2>
+        <p class="aub-step__lede">{productSelectionLede}</p>
+
+        <div class="product-grid">
+            <template for:each={productCards} for:item="card">
+                <article
+                    key={card.key}
+                    class={card.cardClass}
+                    data-id={card.id}
+                    onclick={handleCardClick}
+                    role="button"
+                    tabindex="0"
+                    onkeydown={handleCardKeydown}
+                >
+                    <div class="product-card__header slds-grid slds-grid_align-spread">
+                        <h3 class="product-card__title slds-text-heading_small">{card.productName}</h3>
+                        <template lwc:if={card.selected}>
+                            <lightning-icon
+                                icon-name="utility:check"
+                                alternative-text="Selected"
+                                size="small"
+                                class="product-card__check"
+                            ></lightning-icon>
+                        </template>
+                    </div>
+
+                    <dl class="product-card__attrs slds-m-top_small">
+                        <div class="product-card__row">
+                            <dt class="product-card__dt">Min balance</dt>
+                            <dd class="product-card__dd">{card.minBalance}</dd>
+                        </div>
+                        <div class="product-card__row">
+                            <dt class="product-card__dt">Monthly fee</dt>
+                            <dd class="product-card__dd">{card.monthlyFee}</dd>
+                        </div>
+                        <div class="product-card__row">
+                            <dt class="product-card__dt">APY</dt>
+                            <dd class="product-card__dd product-card__apy">{card.apy}</dd>
+                        </div>
+                    </dl>
+
+                    <div class="slds-m-top_small">
+                        <p class="aub-product-kicker slds-m-bottom_xx-small">Features</p>
+                        <ul class="product-card__features">
+                            <template for:each={card.featuresUi} for:item="feat">
+                                <li key={feat.key}>{feat.text}</li>
+                            </template>
+                        </ul>
+                    </div>
+                </article>
+            </template>
+        </div>
+    </div>
+</template>

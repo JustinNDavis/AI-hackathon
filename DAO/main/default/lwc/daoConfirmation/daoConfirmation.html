@@ -1,0 +1,12 @@
+<template>
+    <div class="aub-step aub-step--pad">
+        <h2 class="aub-step__title">Confirmation</h2>
+        <p class="aub-step__lede">{confirmationLede}</p>
+        <lightning-input
+            type="checkbox"
+            label={confirmationCheckboxLabel}
+            checked={acknowledged}
+            onchange={handleAckChange}
+        ></lightning-input>
+    </div>
+</template>
